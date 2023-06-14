@@ -14,7 +14,7 @@
     import { propTypes } from '/@/utils/propTypes';
     import {getBpmFormSchema} from '../Product.data';
     import {saveOrUpdate} from '../Product.api';
-    
+
     export default defineComponent({
         name: "ProductForm",
         components:{
@@ -59,7 +59,7 @@
             }
 
             initFormData();
-            
+
             return {
                 registerForm,
                 formDisabled,
