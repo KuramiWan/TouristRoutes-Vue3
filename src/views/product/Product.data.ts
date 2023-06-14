@@ -12,12 +12,14 @@ export const columns: BasicColumn[] = [
    {
     title: '描述',
     align:"center",
-    dataIndex: 'productDec'
+    dataIndex: 'productDec',
+    slots: { customRender: 'htmlSlot' },
    },
    {
     title: '出发地',
     align:"center",
-    dataIndex: 'departure'
+    dataIndex: 'departure',
+    slots: { customRender: 'pcaSlot' },
    },
    {
     title: '标签',
@@ -27,7 +29,19 @@ export const columns: BasicColumn[] = [
    {
     title: '海报',
     align:"center",
-    dataIndex: 'img'
+    dataIndex: 'img',
+    customRender:render.renderImage,
+   },
+   {
+    title: '行程标题',
+    align:"center",
+    dataIndex: 'journeyTitle'
+   },
+   {
+    title: '行程描述',
+    align:"center",
+    dataIndex: 'journeyDesc',
+    slots: { customRender: 'htmlSlot' },
    },
 ];
 //查询数据
@@ -43,12 +57,12 @@ export const formSchema: FormSchema[] = [
   {
     label: '描述',
     field: 'productDec',
-    component: 'Input',
+    component: 'JEditor',
   },
   {
     label: '出发地',
     field: 'departure',
-    component: 'Input',
+    component: 'JAreaLinkage',
   },
   {
     label: '标签',
@@ -58,7 +72,19 @@ export const formSchema: FormSchema[] = [
   {
     label: '海报',
     field: 'img',
+     component: 'JImageUpload',
+     componentProps:{
+      },
+  },
+  {
+    label: '行程标题',
+    field: 'journeyTitle',
     component: 'Input',
+  },
+  {
+    label: '行程描述',
+    field: 'journeyDesc',
+    component: 'JEditor',
   },
 	// TODO 主键隐藏字段，目前写死为ID
 	{
