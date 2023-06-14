@@ -39,18 +39,18 @@
       </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <ProductModal @register="registerModal" @success="handleSuccess"></ProductModal>
+    <JourneyTaskModal @register="registerModal" @success="handleSuccess"></JourneyTaskModal>
   </div>
 </template>
 
-<script lang="ts" name="product-product" setup>
+<script lang="ts" name="task-journeyTask" setup>
   import {ref, computed, unref} from 'vue';
   import {BasicTable, useTable, TableAction} from '/@/components/Table';
   import {useModal} from '/@/components/Modal';
   import { useListPage } from '/@/hooks/system/useListPage'
-  import ProductModal from './components/ProductModal.vue'
-  import {columns, searchFormSchema} from './Product.data';
-  import {list, deleteOne, batchDelete, getImportUrl,getExportUrl} from './Product.api';
+  import JourneyTaskModal from './components/JourneyTaskModal.vue'
+  import {columns, searchFormSchema} from './JourneyTask.data';
+  import {list, deleteOne, batchDelete, getImportUrl,getExportUrl} from './JourneyTask.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   const checkedKeys = ref<Array<string | number>>([]);
   //注册model
@@ -58,7 +58,7 @@
   //注册table数据
   const { prefixCls,tableContext,onExportXls,onImportXls } = useListPage({
       tableProps:{
-           title: '旅游产品表',
+           title: '旅行任务表',
            api: list,
            columns,
            canResize:false,
@@ -78,7 +78,7 @@
             },
       },
        exportConfig: {
-            name:"旅游产品表",
+            name:"旅行任务表",
             url: getExportUrl,
           },
           importConfig: {
