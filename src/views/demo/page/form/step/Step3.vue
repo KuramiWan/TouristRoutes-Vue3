@@ -10,40 +10,40 @@
       <a-descriptions :column="1" class="mt-5">
         <a-descriptions-item label="付款账户"> ant-design@alipay.com </a-descriptions-item>
         <a-descriptions-item label="收款账户"> test@example.com </a-descriptions-item>
-        <a-descriptions-item label="收款人姓名"> Jeecg </a-descriptions-item>
+        <a-descriptions-item label="收款人姓名"> 随心游 </a-descriptions-item>
         <a-descriptions-item label="转账金额"> 500元 </a-descriptions-item>
       </a-descriptions>
     </div>
   </div>
 </template>
 <script lang="ts">
-  import { defineComponent } from 'vue';
-  import { Result, Descriptions } from 'ant-design-vue';
-  export default defineComponent({
-    components: {
-      [Result.name]: Result,
-      [Descriptions.name]: Descriptions,
-      [Descriptions.Item.name]: Descriptions.Item,
-    },
-    emits: ['redo'],
-    setup(_, { emit }) {
-      return {
-        redo: () => {
-          emit('redo');
-        },
-      };
-    },
-  });
+import { defineComponent } from 'vue';
+import { Result, Descriptions } from 'ant-design-vue';
+export default defineComponent({
+  components: {
+    [Result.name]: Result,
+    [Descriptions.name]: Descriptions,
+    [Descriptions.Item.name]: Descriptions.Item,
+  },
+  emits: ['redo'],
+  setup(_, { emit }) {
+    return {
+      redo: () => {
+        emit('redo');
+      },
+    };
+  },
+});
 </script>
 <style lang="less" scoped>
-  .step3 {
-    width: 600px;
-    margin: 0 auto;
-  }
+.step3 {
+  width: 600px;
+  margin: 0 auto;
+}
 
-  .desc-wrap {
-    padding: 24px 40px;
-    margin-top: 24px;
-    background-color: @background-color-light;
-  }
+.desc-wrap {
+  padding: 24px 40px;
+  margin-top: 24px;
+  background-color: @background-color-light;
+}
 </style>

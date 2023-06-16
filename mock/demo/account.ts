@@ -2,7 +2,7 @@ import { MockMethod } from 'vite-plugin-mock';
 import { resultSuccess, resultError, baseUrl } from '../_util';
 import { ResultEnum } from '../../src/enums/httpEnum';
 const userInfo = {
-  name: 'Jeecg',
+  name: '随心游',
   userid: '00000001',
   email: 'test@gmail.com',
   signature: '海纳百川，有容乃大',
