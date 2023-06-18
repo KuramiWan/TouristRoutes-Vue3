@@ -22,7 +22,7 @@ export const columns: BasicColumn[] = [
    {
     title: '游客性别',
     align:"center",
-    dataIndex: 'touristGender'
+    dataIndex: 'touristGender_dictText'
    },
    {
     title: '游客手机号',
@@ -83,7 +83,10 @@ export const formSchema: FormSchema[] = [
   {
     label: '游客性别',
     field: 'touristGender',
-    component: 'Input',
+    component: 'JDictSelectTag',
+    componentProps:{
+        dictCode:"gender"
+     },
   },
   {
     label: '游客手机号',

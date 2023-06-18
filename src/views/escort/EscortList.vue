@@ -39,18 +39,18 @@
       </template>
     </BasicTable>
     <!-- 表单区域 -->
-    <TouristModal @register="registerModal" @success="handleSuccess"></TouristModal>
+    <EscortModal @register="registerModal" @success="handleSuccess"></EscortModal>
   </div>
 </template>
 
-<script lang="ts" name="touristss-tourist" setup>
+<script lang="ts" name="escort-escort" setup>
   import {ref, computed, unref} from 'vue';
   import {BasicTable, useTable, TableAction} from '/@/components/Table';
   import {useModal} from '/@/components/Modal';
   import { useListPage } from '/@/hooks/system/useListPage'
-  import TouristModal from './components/TouristModal.vue'
-  import {columns, searchFormSchema} from './Tourist.data';
-  import {list, deleteOne, batchDelete, getImportUrl,getExportUrl} from './Tourist.api';
+  import EscortModal from './components/EscortModal.vue'
+  import {columns, searchFormSchema} from './Escort.data';
+  import {list, deleteOne, batchDelete, getImportUrl,getExportUrl} from './Escort.api';
   import { downloadFile } from '/@/utils/common/renderUtils';
   const checkedKeys = ref<Array<string | number>>([]);
   //注册model
@@ -58,7 +58,7 @@
   //注册table数据
   const { prefixCls,tableContext,onExportXls,onImportXls } = useListPage({
       tableProps:{
-           title: '游客信息表',
+           title: '伴游人的基本信息',
            api: list,
            columns,
            canResize:false,
@@ -78,7 +78,7 @@
             },
       },
        exportConfig: {
-            name:"游客信息表",
+            name:"伴游人的基本信息",
             url: getExportUrl,
           },
           importConfig: {
