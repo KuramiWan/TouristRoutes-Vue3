@@ -40,7 +40,7 @@
             });
 
             let formData = {};
-            const queryByIdUrl = '/order/orders/queryById';
+            const queryByIdUrl = '/orders/orders/queryById';
             async function initFormData(){
                 let params = {id: props.formData.dataId};
                 const data = await defHttp.get({url: queryByIdUrl, params});

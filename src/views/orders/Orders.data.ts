@@ -17,33 +17,27 @@ export const columns: BasicColumn[] = [
    {
     title: '订单状态',
     align:"center",
-    dataIndex: 'orderStatus'
+    dataIndex: 'orderStatus_dictText'
    },
    {
     title: '订单金额',
     align:"center",
-    dataIndex: 'ordreMoney'
+    dataIndex: 'orderMoney'
    },
    {
     title: '支付方式',
     align:"center",
-    dataIndex: 'payMethod'
+    dataIndex: 'payMethod_dictText'
    },
    {
     title: '支付状态',
     align:"center",
-    dataIndex: 'payStatus',
-    customRender:({text}) =>{
-      return !text?"":(text.length>10?text.substr(0,10):text)
-    },
+    dataIndex: 'payStatus_dictText'
    },
    {
     title: '支付时间',
     align:"center",
-    dataIndex: 'payData',
-    customRender:({text}) =>{
-      return !text?"":(text.length>10?text.substr(0,10):text)
-    },
+    dataIndex: 'payDate'
    },
    {
     title: '支付金额',
@@ -51,34 +45,118 @@ export const columns: BasicColumn[] = [
     dataIndex: 'payMoney'
    },
    {
-    title: '备注',
+    title: '订单备注',
     align:"center",
     dataIndex: 'note'
-   },
-   {
-    title: '创建时间',
-    align:"center",
-    dataIndex: 'createDate',
-    customRender:({text}) =>{
-      return !text?"":(text.length>10?text.substr(0,10):text)
-    },
-   },
-   {
-    title: '更新时间',
-    align:"center",
-    dataIndex: 'updateDate',
-    customRender:({text}) =>{
-      return !text?"":(text.length>10?text.substr(0,10):text)
-    },
-   },
-   {
-    title: '时间戳',
-    align:"center",
-    dataIndex: 'ts'
    },
 ];
 //查询数据
 export const searchFormSchema: FormSchema[] = [
+	{
+      label: "产品id",
+      field: 'productId',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "客户id",
+      field: 'userId',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "订单状态",
+      field: 'orderStatus',
+      component: 'JDictSelectTag',
+      componentProps:{
+          dictCode:"order_status"
+      },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "订单金额",
+      field: 'orderMoney',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "支付方式",
+      field: 'payMethod',
+      component: 'JDictSelectTag',
+      componentProps:{
+          dictCode:"pay_method"
+      },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "支付状态",
+      field: 'payStatus',
+      component: 'JDictSelectTag',
+      componentProps:{
+          dictCode:"pay_status"
+      },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "支付时间",
+      field: 'payDate',
+      component: 'DatePicker',
+      componentProps: {
+         showTime:true,
+         valueFormat: 'YYYY-MM-DD HH:mm:ss'
+       },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "支付金额",
+      field: 'payMoney',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "订单备注",
+      field: 'note',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "创建日期",
+      field: 'createTime',
+      component: 'DatePicker',
+      componentProps: {
+         showTime:true,
+         valueFormat: 'YYYY-MM-DD HH:mm:ss'
+       },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "更新日期",
+      field: 'updateTime',
+      component: 'DatePicker',
+      componentProps: {
+         showTime:true,
+         valueFormat: 'YYYY-MM-DD HH:mm:ss'
+       },
+      colProps: {span: 6},
+ 	},
+	{
+      label: "创建人",
+      field: 'createBy',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "更新人",
+      field: 'updateBy',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
+	{
+      label: "所属部门",
+      field: 'sysOrgCode',
+      component: 'Input',
+      colProps: {span: 6},
+ 	},
 ];
 //表单数据
 export const formSchema: FormSchema[] = [
@@ -95,32 +173,40 @@ export const formSchema: FormSchema[] = [
   {
     label: '订单状态',
     field: 'orderStatus',
-    component: 'InputNumber',
-    dynamicRules: ({model,schema}) => {
-          return [
-                 { required: true, message: '请输入订单状态!'},
-          ];
+    component: 'JDictSelectTag',
+    componentProps:{
+        dictCode:"order_status"
      },
   },
   {
     label: '订单金额',
-    field: 'ordreMoney',
+    field: 'orderMoney',
     component: 'InputNumber',
   },
   {
     label: '支付方式',
     field: 'payMethod',
-    component: 'Input',
+    component: 'JDictSelectTag',
+    componentProps:{
+        dictCode:"pay_method"
+     },
   },
   {
     label: '支付状态',
     field: 'payStatus',
-    component: 'DatePicker',
+    component: 'JDictSelectTag',
+    componentProps:{
+        dictCode:"pay_status"
+     },
   },
   {
     label: '支付时间',
-    field: 'payData',
+    field: 'payDate',
     component: 'DatePicker',
+    componentProps: {
+       showTime: true,
+       valueFormat: 'YYYY-MM-DD HH:mm:ss'
+     },
   },
   {
     label: '支付金额',
@@ -128,24 +214,9 @@ export const formSchema: FormSchema[] = [
     component: 'InputNumber',
   },
   {
-    label: '备注',
+    label: '订单备注',
     field: 'note',
-    component: 'InputTextArea',
-  },
-  {
-    label: '创建时间',
-    field: 'createDate',
-    component: 'DatePicker',
-  },
-  {
-    label: '更新时间',
-    field: 'updateDate',
-    component: 'DatePicker',
-  },
-  {
-    label: '时间戳',
-    field: 'ts',
-    component: 'InputNumber',
+    component: 'Input',
   },
 	// TODO 主键隐藏字段，目前写死为ID
 	{
