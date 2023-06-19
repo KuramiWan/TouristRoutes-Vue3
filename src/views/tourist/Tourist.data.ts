@@ -6,62 +6,102 @@ import { render } from '/@/utils/common/renderUtils';
 export const columns: BasicColumn[] = [
   {
     title: '真实名称',
-    align: 'center',
-    dataIndex: 'touristName',
+    align: "center",
+    dataIndex: 'touristName'
   },
   {
     title: '昵称',
-    align: 'center',
-    dataIndex: 'touristNickname',
+    align: "center",
+    dataIndex: 'touristNickname'
   },
   {
     title: '年龄',
-    align: 'center',
-    dataIndex: 'touristAge',
+    align: "center",
+    dataIndex: 'touristAge'
   },
   {
     title: '性别',
-    align: 'center',
-    dataIndex: 'touristGender_dictText',
+    align: "center",
+    dataIndex: 'touristGender_dictText'
   },
   {
     title: '手机号',
-    align: 'center',
-    dataIndex: 'touristPhoneNumber',
+    align: "center",
+    dataIndex: 'touristPhoneNumber'
   },
   {
     title: '邮箱',
-    align: 'center',
-    dataIndex: 'touristEmail',
+    align: "center",
+    dataIndex: 'touristEmail'
   },
   {
     title: '国籍',
-    align: 'center',
-    dataIndex: 'touristNationality',
+    align: "center",
+    dataIndex: 'touristNationality'
   },
   {
     title: '偏好',
-    align: 'center',
-    dataIndex: 'touristPreference',
+    align: "center",
+    dataIndex: 'touristPreference'
   },
   {
     title: '健康状态',
-    align: 'center',
-    dataIndex: 'touristHealthCondition',
+    align: "center",
+    dataIndex: 'touristHealthCondition'
   },
   {
     title: '平台内货币',
-    align: 'center',
-    dataIndex: 'utouristPlatformCurrency',
+    align: "center",
+    dataIndex: 'utouristPlatformCurrency'
   },
   {
     title: '紧急联系人手机号',
-    align: 'center',
-    dataIndex: 'touristEmergencyContact',
+    align: "center",
+    dataIndex: 'touristEmergencyContact'
   },
 ];
 //查询数据
-export const searchFormSchema: FormSchema[] = [];
+export const searchFormSchema: FormSchema[] = [
+  {
+    label: "游客真实名称",
+    field: 'touristName',
+    component: 'Input',
+    colProps: { span: 6 },
+  },
+  {
+    label: "游客昵称",
+    field: 'touristNickname',
+    component: 'Input',
+    colProps: { span: 6 },
+  },
+  {
+    label: "游客年龄",
+    field: 'touristAge',
+    component: 'Input',
+    colProps: { span: 6 },
+  },
+  {
+    label: "游客性别",
+    field: 'touristGender',
+    component: 'JDictSelectTag',
+    componentProps: {
+      dictCode: "gender"
+    },
+    colProps: { span: 6 },
+  },
+  {
+    label: "游客手机号",
+    field: 'touristPhoneNumber',
+    component: 'Input',
+    colProps: { span: 6 },
+  },
+  {
+    label: "游客国籍",
+    field: 'touristNationality',
+    component: 'Input',
+    colProps: { span: 6 },
+  },
+];
 //表单数据
 export const formSchema: FormSchema[] = [
   {
@@ -84,7 +124,7 @@ export const formSchema: FormSchema[] = [
     field: 'touristGender',
     component: 'JDictSelectTag',
     componentProps: {
-      dictCode: 'gender',
+      dictCode: "gender"
     },
   },
   {
@@ -127,14 +167,16 @@ export const formSchema: FormSchema[] = [
     label: '',
     field: 'id',
     component: 'Input',
-    show: false,
+    show: false
   },
 ];
 
+
+
 /**
- * 流程表单调用这个方法获取formSchema
- * @param param
- */
+* 流程表单调用这个方法获取formSchema
+* @param param
+*/
 export function getBpmFormSchema(_formData): FormSchema[] {
   // 默认和原始表单保持一致 如果流程中配置了权限数据，这里需要单独处理formSchema
   return formSchema;
