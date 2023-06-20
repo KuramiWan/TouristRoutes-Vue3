@@ -12,7 +12,7 @@ enum Api {
 export function getProductListApi(data: any) {
   return request({
     url: Api.list,
-    method: 'POST',
+    method: 'GET',
     data,
   });
 }
