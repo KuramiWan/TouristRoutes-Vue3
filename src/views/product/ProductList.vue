@@ -27,6 +27,10 @@
         <span>
           <a>编辑</a>
           <a-divider type="vertical" />
+          <!-- 添加行程 -->
+          <AddSchedule></AddSchedule>
+          <!-- 添加任务 -->
+
           <a>删除</a>
           <a-divider type="vertical" />
           <a-dropdown>
@@ -51,61 +55,62 @@
   </a-table>
 </template>
 <script setup>
-import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
-import { ref } from 'vue';
-import { getProductListApi } from '/@/views/product/Product.api';
-let data = ref();
-let columns = ref([
-  {
-    title: '标题',
-    dataIndex: 'title',
-    key: 'title',
-    resizable: true,
-    width: 100,
-    minWidth: 100,
-    maxWidth: 200,
-  },
-  {
-    title: '描述',
-    dataIndex: 'productDec',
-    key: 'productDec',
-  },
-  {
-    title: '目的地',
-    key: 'departure',
-    dataIndex: 'departure',
-  },
-  {
-    title: '海报',
-    key: 'img',
-    dataIndex: 'img',
-  },
-  {
-    title: '操作',
-    key: 'action',
-  },
-]);
-let pageination = {
-  total: 0,
-  pageSize: 10,
-  showSizeChanger: true,
-  // pageSizeOptions: ['10', '20', '30'],
-  showTotal: (total) => `全部 ${total} 条`,
-  showSizeChange: (current, pageSize) => {
-    this.pageSize = pageSize;
-  },
-};
-function getProductList() {
-  const pageParams = {
-    pageNo: 1,
-    pageSize: 5,
+  import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
+  import { ref } from 'vue';
+  import { getProductListApi } from '/@/views/product/Product.api';
+  import AddSchedule from './components/AddSchedule.vue';
+  let data = ref();
+  let columns = ref([
+    {
+      title: '标题',
+      dataIndex: 'title',
+      key: 'title',
+      resizable: true,
+      width: 100,
+      minWidth: 100,
+      maxWidth: 200,
+    },
+    {
+      title: '描述',
+      dataIndex: 'productDec',
+      key: 'productDec',
+    },
+    {
+      title: '目的地',
+      key: 'departure',
+      dataIndex: 'departure',
+    },
+    {
+      title: '海报',
+      key: 'img',
+      dataIndex: 'img',
+    },
+    {
+      title: '操作',
+      key: 'action',
+    },
+  ]);
+  let pageination = {
+    total: 0,
+    pageSize: 10,
+    showSizeChanger: true,
+    // pageSizeOptions: ['10', '20', '30'],
+    showTotal: (total) => `全部 ${total} 条`,
+    showSizeChange: (current, pageSize) => {
+      this.pageSize = pageSize;
+    },
   };
-  getProductListApi(pageParams).then((res) => {
-    let result = res.result;
-    data.value = result.records;
-    pageination.total = result.total;
-  });
-}
+  function getProductList() {
+    const pageParams = {
+      pageNo: 1,
+      pageSize: 5,
+    };
+    getProductListApi(pageParams).then((res) => {
+      let result = res.result;
+      data.value = result.records;
+      pageination.total = result.total;
+    });
+  }
 
-getProductList();
+  getProductList();
 </script>
