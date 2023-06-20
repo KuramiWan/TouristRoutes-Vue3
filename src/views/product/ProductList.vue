@@ -24,13 +24,15 @@
         <img style="max-width: 50px" :src="record.img" />
       </template>
       <template v-else-if="column.key === 'action'">
-        <span>
+        <span style="display: flex;align-items: center;">
           <a>编辑</a>
           <a-divider type="vertical" />
           <!-- 添加行程 -->
-          <AddSchedule></AddSchedule>
+          <AddSchedule name="添加日程"></AddSchedule>
+          <a-divider type="vertical" />
           <!-- 添加任务 -->
-
+          <AddSchedule name="添加任务"></AddSchedule>
+          <a-divider type="vertical" />
           <a>删除</a>
           <a-divider type="vertical" />
           <a-dropdown>
@@ -41,7 +43,7 @@
             <template #overlay>
               <a-menu>
                 <a-menu-item>
-                  <a href="javascript:;">详情</a>
+                  <a @click="showTimeLine">详情</a>
                 </a-menu-item>
                 <a-menu-item>
                   <a href="javascript:;">其它</a>
@@ -53,13 +55,16 @@
       </template>
     </template>
   </a-table>
+  <TimeLineModal ref="timeLineModal" />
 </template>
 <script setup>
   import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { ref } from 'vue';
   import { getProductListApi } from '/@/views/product/Product.api';
+  import TimeLineModal from './components/TimeLineModal.vue';
   import AddSchedule from './components/AddSchedule.vue';
   let data = ref();
+  const timeLineModal = ref();
   let columns = ref([
     {
       title: '标题',
@@ -113,4 +118,9 @@
   }
 
   getProductList();
+
+  // showTimeLine
+  function showTimeLine() {
+    timeLineModal.value.showModal();
+  }
 </script>
