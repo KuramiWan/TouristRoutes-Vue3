@@ -106,7 +106,7 @@ function createRequestFunction(service: AxiosInstance) {
         'X-Access-Token': getLocalToken(),
       },
       timeout: 5000,
-      baseURL: import.meta.env.VITE_BASE_API,
+      baseURL: import.meta.env.VITE_GLOB_DOMAIN_URL,
       data: {},
     };
     return service(Object.assign(configDefault, config));
@@ -124,7 +124,7 @@ function createTenantRequestFunction(service: AxiosInstance) {
         'Content-Type': get(config, 'headers.Content-Type', 'application/json'),
       },
       timeout: 5000,
-      baseURL: import.meta.env.VITE_BASE_API,
+      baseURL: import.meta.env.VITE_GLOB_DOMAIN_URL,
       data: {},
     };
     return service(Object.assign(configDefault, config));

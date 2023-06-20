@@ -1,115 +1,111 @@
 <template>
-  <a-table :columns="columns" :data-source="data" @resizeColumn="handleResizeColumn">
+  <a-table :columns="columns" :data-source="data" :pagination="pageination" @resizeColumn="handleResizeColumn">
     <template #headerCell="{ column }">
-      <template v-if="column.key === 'name'">
+      <template v-if="column.key === 'title'">
         <span>
           <smile-outlined />
-          Name
+          标题
         </span>
       </template>
     </template>
 
     <template #bodyCell="{ column, record }">
-      <template v-if="column.key === 'name'">
+      <template v-if="column.key === 'productDec'">
         <a>
-          {{ record.name }}
+          {{ record.productDec }}
         </a>
       </template>
-      <template v-else-if="column.key === 'tags'">
-        <span>
-          <a-tag v-for="tag in record.tags" :key="tag"
-            :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'">
-            {{ tag.toUpperCase() }}
-          </a-tag>
-        </span>
+      <template v-else-if="column.key === 'departure'">
+        <a>
+          {{ record.departure }}
+        </a>
+      </template>
+      <template v-else-if="column.key === 'img'">
+        <img style="max-width: 50px" :src="record.img" />
       </template>
       <template v-else-if="column.key === 'action'">
         <span>
-          <a>Invite 一 {{ record.name }}</a>
+          <a>编辑</a>
           <a-divider type="vertical" />
-          <a>Delete</a>
+          <a>删除</a>
           <a-divider type="vertical" />
-          <a class="ant-dropdown-link">
-            More actions
-            <down-outlined />
-          </a>
+          <a-dropdown>
+            <a class="ant-dropdown-link" @click.prevent>
+              更多操作
+              <DownOutlined />
+            </a>
+            <template #overlay>
+              <a-menu>
+                <a-menu-item>
+                  <a href="javascript:;">详情</a>
+                </a-menu-item>
+                <a-menu-item>
+                  <a href="javascript:;">其它</a>
+                </a-menu-item>
+              </a-menu>
+            </template>
+          </a-dropdown>
         </span>
       </template>
     </template>
   </a-table>
 </template>
-<script>
+<script setup>
 import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
-import { defineComponent, ref } from 'vue';
-import ProductOperate from './components/ProductOperate.vue';
-const data = [
+import { ref } from 'vue';
+import { getProductListApi } from '/@/views/product/Product.api';
+let data = ref();
+let columns = ref([
   {
-    key: '1',
-    productDec: 'John Brown',
-    title: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
+    title: '标题',
+    dataIndex: 'title',
+    key: 'title',
+    resizable: true,
+    width: 100,
+    minWidth: 100,
+    maxWidth: 200,
   },
   {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
+    title: '描述',
+    dataIndex: 'productDec',
+    key: 'productDec',
   },
-];
-export default defineComponent({
-  components: {
-    SmileOutlined,
-    DownOutlined,
-    ProductOperate
+  {
+    title: '目的地',
+    key: 'departure',
+    dataIndex: 'departure',
   },
-  setup() {
-    const columns = ref([
-      // {
-      //   dataIndex: 'title',
-      //   key: 'title',
-      //   resizable: true,
-      //   width: 150,
-      // },
-      {
-        title: '标题',
-        dataIndex: 'title',
-        key: 'title',
-        resizable: true,
-        width: 100,
-        minWidth: 100,
-        maxWidth: 200,
-      },
-      {
-        title: '描述',
-        dataIndex: 'productDec',
-        key: 'productDec',
-      },
-      {
-        title: '目的地',
-        key: 'departure',
-        dataIndex: 'departure',
-      },
-      {
-        title: '海报',
-        key: 'img',
-      },
-    ]);
-    return {
-      data,
-      columns,
-      handleResizeColumn: (w, col) => {
-        col.width = w;
-      },
-    };
+  {
+    title: '海报',
+    key: 'img',
+    dataIndex: 'img',
   },
-});
+  {
+    title: '操作',
+    key: 'action',
+  },
+]);
+let pageination = {
+  total: 0,
+  pageSize: 10,
+  showSizeChanger: true,
+  // pageSizeOptions: ['10', '20', '30'],
+  showTotal: (total) => `全部 ${total} 条`,
+  showSizeChange: (current, pageSize) => {
+    this.pageSize = pageSize;
+  },
+};
+function getProductList() {
+  const pageParams = {
+    pageNo: 1,
+    pageSize: 5,
+  };
+  getProductListApi(pageParams).then((res) => {
+    let result = res.result;
+    data.value = result.records;
+    pageination.total = result.total;
+  });
+}
+
+getProductList();
 </script>
