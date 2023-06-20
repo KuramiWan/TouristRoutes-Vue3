@@ -43,8 +43,8 @@
   const data = [
     {
       key: '1',
-      name: 'John Brown',
-      age: 32,
+      productDec: 'John Brown',
+      title: 32,
       address: 'New York No. 1 Lake Park',
       tags: ['nice', 'developer'],
     },
@@ -70,34 +70,34 @@
     },
     setup() {
       const columns = ref([
+        // {
+        //   dataIndex: 'title',
+        //   key: 'title',
+        //   resizable: true,
+        //   width: 150,
+        // },
         {
-          dataIndex: 'name',
-          key: 'name',
-          resizable: true,
-          width: 150,
-        },
-        {
-          title: 'Age',
-          dataIndex: 'age',
-          key: 'age',
+          title: '标题',
+          dataIndex: 'title',
+          key: 'title',
           resizable: true,
           width: 100,
           minWidth: 100,
           maxWidth: 200,
         },
         {
-          title: 'Address',
-          dataIndex: 'address',
-          key: 'address',
+          title: '描述',
+          dataIndex: 'productDec',
+          key: 'productDec',
         },
         {
-          title: 'Tags',
-          key: 'tags',
-          dataIndex: 'tags',
+          title: '目的地',
+          key: 'departure',
+          dataIndex: 'departure',
         },
         {
-          title: 'Action',
-          key: 'action',
+          title: '海报',
+          key: 'img',
         },
       ]);
       return {

@@ -1,3 +1,5 @@
+import { request } from '/@/views/product/request';
+
 enum Api {
   list = '/product/product/list',
   save = '/product/product/add',
@@ -7,4 +9,10 @@ enum Api {
   importExcel = '/product/product/importExcel',
   exportXls = '/product/product/exportXls',
 }
-
+export function getProductListApi(data: any) {
+  return request({
+    url: Api.list,
+    method: 'POST',
+    data,
+  });
+}
