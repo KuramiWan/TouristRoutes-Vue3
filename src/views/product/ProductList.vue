@@ -37,7 +37,7 @@
             <template #overlay>
               <a-menu>
                 <a-menu-item>
-                  <a href="javascript:;">详情</a>
+                  <a @click="showTimeLine">详情</a>
                 </a-menu-item>
                 <a-menu-item>
                   <a href="javascript:;">其它</a>
@@ -49,12 +49,15 @@
       </template>
     </template>
   </a-table>
+  <TimeLineModal ref="timeLineModal" />
 </template>
 <script setup>
   import { SmileOutlined, DownOutlined } from '@ant-design/icons-vue';
   import { ref } from 'vue';
   import { getProductListApi } from '/@/views/product/Product.api';
+  import TimeLineModal from './components/TimeLineModal.vue';
   let data = ref();
+  const timeLineModal = ref();
   let columns = ref([
     // {
     //   dataIndex: 'title',
@@ -121,4 +124,9 @@
   // }
 
   getProductList();
+
+  // showTimeLine
+  function showTimeLine() {
+    timeLineModal.value.showModal();
+  }
 </script>
