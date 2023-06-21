@@ -2,7 +2,7 @@ import { request } from '/@/views/product/request';
 
 enum Api {
   list = '/product/product/list',
-  getById = '/product/product/queryById',
+  queryById = '/product/product/queryById',
   save = '/product/product/add',
   edit = '/product/product/edit',
   deleteOne = '/product/product/delete',
@@ -17,11 +17,12 @@ export function getProductListApi(data: any) {
     data,
   });
 }
-
-export function getProductByIdApi(data: any) {
+export function getProductListByIdApi(id: string) {
   return request({
-    url: Api.getById,
+    url: Api.queryById,
     method: 'GET',
-    data,
+    params: {
+      id: id,
+    },
   });
 }
