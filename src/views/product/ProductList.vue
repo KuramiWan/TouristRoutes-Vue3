@@ -27,11 +27,11 @@
         <span style="display: flex;align-items: center;">
           <a>编辑</a>
           <a-divider type="vertical" />
-          <!-- 添加行程 -->
-          <AddSchedule name="添加日程"></AddSchedule>
+          <!-- 添加日程 -->
+          <AddSchedule name="添加日程" :id="record.id"></AddSchedule>
           <a-divider type="vertical" />
           <!-- 添加任务 -->
-          <AddSchedule name="添加任务"></AddSchedule>
+          <AddSchedule name="添加任务" :id="record.id"></AddSchedule>
           <a-divider type="vertical" />
           <a>删除</a>
           <a-divider type="vertical" />
