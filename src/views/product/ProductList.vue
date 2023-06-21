@@ -24,7 +24,7 @@
         <img style="max-width: 50px" :src="record.img" />
       </template>
       <template v-else-if="column.key === 'action'">
-        <span style="display: flex;align-items: center;">
+        <span style="display: flex; align-items: center">
           <a>编辑</a>
           <a-divider type="vertical" />
           <!-- 添加行程 -->
@@ -43,7 +43,7 @@
             <template #overlay>
               <a-menu>
                 <a-menu-item>
-                  <a @click="showTimeLine">详情</a>
+                  <a @click="showTimeLine(record.id)">详情</a>
                 </a-menu-item>
                 <a-menu-item>
                   <a href="javascript:;">其它</a>
@@ -120,7 +120,7 @@
   getProductList();
 
   // showTimeLine
-  function showTimeLine() {
-    timeLineModal.value.showModal();
+  function showTimeLine(id) {
+    timeLineModal.value.showModal(id);
   }
 </script>
