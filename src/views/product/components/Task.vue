@@ -8,8 +8,8 @@
     </a-form>
 </template>
 <script>
-import { defineComponent, reactive } from 'vue';
-import { getProductByIdApi } from '../Product.api'
+import { defineComponent, reactive, ref, defineExpose } from 'vue';
+import { getProductListByIdApi } from '../Product.api'
 export default defineComponent({
     props: ['id'],
     setup(props) {
@@ -18,15 +18,21 @@ export default defineComponent({
             username: '',
         });
 
+        let journeyDays = reactive([]);
         const query = () => {
-            let product = getProductByIdApi(props.id)
-            console.log(product)
+            getProductListByIdApi(props.id).then((res) => {
+                journeyDays = res.result.journeyDays
+                console.log(journeyDays)
+            })
+            return journeyDays;
         }
 
         return {
             formDate,
             query
+
         };
+
     },
 });
 </script>

@@ -12,35 +12,35 @@
     </a-form>
 </template>
 <script>
-import { defineComponent, reactive, ref } from 'vue';
-import { saveOrUpdate } from '../../journey_day/JourneyDay.api'
-export default defineComponent({
-    props: ['id'],
-    setup(props) {
-        // console.log(props.id)
-        let formDate = reactive({
-            productId: props.id,
-            date: '',
-            journeyDayDec: '',
-            title: ''
-        });
-        const clear = () => {
-            formDate.productId = ''
-            formDate.date = ''
-            formDate.journeyDayDec = ''
-            formDate.title = ''
-        }
+    import { defineComponent, reactive, ref } from 'vue';
+    import { saveOrUpdate } from '../../journey_day/JourneyDay.api'
+    export default defineComponent({
+        props: ['id'],
+        setup(props) {
+            // console.log(props.id)
+            let formDate = reactive({
+                productId: props.id,
+                date: '',
+                journeyDayDec: '',
+                title: ''
+            });
+            const clear = () => {
+                formDate.productId = ''
+                formDate.date = ''
+                formDate.journeyDayDec = ''
+                formDate.title = ''
+            }
 
-        const add = () => {
-            formDate.date = 'day' + formDate.date
-            saveOrUpdate(formDate)
-        }
+            const add = () => {
+                formDate.date = 'day' + formDate.date
+                saveOrUpdate(formDate)
+            }
 
-        return {
-            formDate,
-            clear,
-            add
-        };
-    },
-});
+            return {
+                formDate,
+                clear,
+                add
+            };
+        },
+    });
 </script>

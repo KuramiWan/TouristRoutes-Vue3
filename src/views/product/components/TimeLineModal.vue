@@ -10,7 +10,9 @@
           <a-timeline mode="left">
             <template v-for="task in journeyDay.tasks" :key="task.id">
               <a-timeline-item color="red" style="color: rgb(237, 111, 111)">
-                <template #dot><ClockCircleOutlined style="font-size: 16px" /></template>
+                <template #dot>
+                  <ClockCircleOutlined style="font-size: 16px" />
+                </template>
                 {{ task.time }}
               </a-timeline-item>
               <a-timeline-item color="#00CCFF" style="color: #00ccff">{{ task.title }}</a-timeline-item>
@@ -19,8 +21,7 @@
                 <template #dot>
                   <SmileOutlined />
                 </template>
-                {{ task.action }}</a-timeline-item
-              >
+                {{ task.action }}</a-timeline-item>
               <!-- <a-timeline-item>
               <template #dot><ClockCircleOutlined style="font-size: 16px" /></template>
             </a-timeline-item> -->
@@ -66,8 +67,8 @@
         productDec: string;
         journeyDays: JourneyDaysData[];
       }
-      const visible = ref<boolean>(false);
-      const timelineData = ref<TimeLineData>({
+      const visible = ref < boolean > (false);
+      const timelineData = ref < TimeLineData > ({
         title: '',
         productDec: '',
         journeyDays: [
