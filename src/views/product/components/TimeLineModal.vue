@@ -3,8 +3,9 @@
   <div>
     <!-- <a-button type="primary" @click="showModal">详情</a-button> -->
     <a-modal v-model:visible="visible" title="产品详情" @ok="handleOk">
-      <a-card v-for="journeyDay in timelineData.journeyDays" :key="journeyDay.id">
-        <h3>{{ journeyDay.date }} -- {{ journeyDay.title }}</h3>
+      <a-card v-for="(journeyDay, index) in timelineData.journeyDays" :key="journeyDay.id">
+        <h3>Day:{{ index + 1 }}&nbsp;{{ journeyDay.title }}</h3>
+        <!-- <h3>{{ journeyDay.date }} -- {{ journeyDay.title }}</h3> -->
         <a-card>
           <a-timeline mode="left">
             <template v-for="task in journeyDay.tasks" :key="task.id">
@@ -66,40 +67,25 @@
         journeyDays: JourneyDaysData[];
       }
       const visible = ref<boolean>(false);
-      const timelineData = ref<TimeLineData>();
-      // 模拟时间轴数据
-      timelineData.value = {
-        title: 'qqq',
-        productDec: '12214sdgf',
+      const timelineData = ref<TimeLineData>({
+        title: '',
+        productDec: '',
         journeyDays: [
           {
-            title: '123',
-            journeyDayDec: 'asgsad',
-            date: '2023-2-3',
+            title: '',
+            journeyDayDec: '',
+            date: '',
             tasks: [
               {
-                title: 'string',
-                subtitle: 'string',
-                action: '读书',
-                time: '2024-2-24-19-09',
-              },
-            ],
-          },
-          {
-            title: '123',
-            journeyDayDec: 'asgsad',
-            date: '2023-2-3',
-            tasks: [
-              {
-                title: 'string',
-                subtitle: 'string',
-                action: '爬山',
-                time: '2024-2-24-19-09',
+                title: '',
+                subtitle: '',
+                action: '',
+                time: '',
               },
             ],
           },
         ],
-      };
+      });
 
       // 发送网络请求获取每个产品的数据
       const getProductListById = (id: string) => {
