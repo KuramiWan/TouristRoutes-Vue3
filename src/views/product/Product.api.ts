@@ -17,7 +17,6 @@ export function getProductListApi(data: any) {
     data,
   });
 }
-
 export function getProductListByIdApi(id: string) {
   return request({
     url: Api.queryById,
