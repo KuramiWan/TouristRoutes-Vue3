@@ -2,59 +2,52 @@
     <div>
         <a @click="showModalForm">{{ name }}</a>
         <a-modal v-model:visible="visible" :title="name" @ok="handleOk">
-            <Form v-if="name === '添加日程'" :id="id" ref="FormComponent"></Form>
-            <Task v-else :id="id" ref="TaskComponent"></Task>
+            <Form v-if="name === '编辑日程'" :id="id" ref="FormComponent"></Form>
         </a-modal>
     </div>
 </template>
 <script>
-import { ref, defineComponent, reactive, watch, } from 'vue';
-import Form from './Form.vue';
-import Task from './Task.vue';
+    import { ref, defineComponent, reactive, watch, } from 'vue';
+    import Form from './Form.vue';
 
-export default defineComponent({
-    props: ['name', 'id'],
-    components: { Form, Task },
-    setup(props, context) {
-        const visible = ref(false);
-        const FormComponent = ref(null);
-        const TaskComponent = ref(null);
+    export default defineComponent({
+        props: ['name', 'id'],
+        components: { Form },
+        setup(props, context) {
+            const visible = ref(false);
+            const FormComponent = ref(null);
 
-        const DemoComponent = ref(null)
+            const showModalForm = () => {
+                visible.value = true;
+            };
 
-        const showModalForm = () => {
-            visible.value = true;
-        };
-
-        const handleOk = () => {
-            if (props.name === '添加日程') {
-                // 子组件数据传给数据库
-                FormComponent.value.add()
-            } else {
-
-            }
-            visible.value = false;
-        };
-
-        watch(visible, () => {
-            if (!visible.value) {
-                if (props.name === '添加日程') {
-                    // 清空子组件数据
-                    FormComponent.value.clear();
+            const handleOk = () => {
+                if (props.name === '编辑日程') {
+                    // 子组件数据传给数据库
+                    FormComponent.value.add()
                 } else {
-
+                    // pass
                 }
-            }
-        })
+                visible.value = false;
+            };
 
-        return {
-            showModalForm,
-            visible,
-            handleOk,
-            FormComponent,
-            TaskComponent,
+            watch(visible, () => {
+                if (!visible.value) {
+                    if (props.name === '编辑日程') {
+                        // 清空子组件数据
+                        FormComponent.value.clear();
+                    } else {
+                        // pass
+                    }
+                }
+            })
 
-        };
-    },
-});
+            return {
+                showModalForm,
+                visible,
+                handleOk,
+                FormComponent,
+            };
+        },
+    });
 </script>

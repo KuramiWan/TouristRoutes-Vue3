@@ -28,10 +28,10 @@
           <a>编辑</a>
           <a-divider type="vertical" />
           <!-- 添加日程 -->
-          <AddSchedule name="添加日程" :id="record.id"></AddSchedule>
+          <AddSchedule name="编辑日程" :id="record.id"></AddSchedule>
           <a-divider type="vertical" />
           <!-- 添加任务 -->
-          <AddSchedule name="添加任务" :id="record.id"></AddSchedule>
+          <AddTask name="编辑任务" :id="record.id"></AddTask>
           <a-divider type="vertical" />
           <a>删除</a>
           <a-divider type="vertical" />
@@ -63,6 +63,7 @@
   import { getProductListApi } from '/@/views/product/Product.api';
   import TimeLineModal from './components/TimeLineModal.vue';
   import AddSchedule from './components/AddSchedule.vue';
+  import AddTask from './components/AddTask.vue';
   let data = ref();
   const timeLineModal = ref();
   let columns = ref([
