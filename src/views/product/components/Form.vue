@@ -19,7 +19,6 @@
     setup(props) {
       // console.log(props.id)
       let formDate = reactive({
-        productId: props.id,
         date: '',
         journeyDayDec: '',
         title: '',
@@ -32,6 +31,7 @@
       };
 
       const add = () => {
+        formDate.productId = props.id;
         formDate.date = 'day' + formDate.date;
         saveOrUpdate(formDate);
       };

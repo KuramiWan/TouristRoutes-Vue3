@@ -16,11 +16,12 @@
         username: '',
       });
 
-      let journeyDays = reactive([]);
-      const query = () => {
+      let journeyDays = ref([]);
+      const queryTask = () => {
         getProductListByIdApi(props.id).then((res) => {
-          journeyDays = res.result.journeyDays;
-          console.log(journeyDays);
+          journeyDays.value = res.result.journeyDays;
+          // 第一天的任务集合
+          // console.log(journeyDays.value[0].tasks)
         });
         return journeyDays;
       };
