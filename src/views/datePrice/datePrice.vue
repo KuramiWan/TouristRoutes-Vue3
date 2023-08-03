@@ -70,6 +70,7 @@
   </a-table>
     </div>
 </template>
+
 <script lang="ts" setup>
 import { computed, onMounted, reactive, ref } from 'vue';
 import type { Ref, UnwrapRef } from 'vue';
@@ -260,7 +261,7 @@ const commitSave = () => {
 </script>
 
 <style lang="less" scoped>
-.editable-add-btn {
+  .editable-add-btn {
     margin: 10px 5px;
   }
 </style>
