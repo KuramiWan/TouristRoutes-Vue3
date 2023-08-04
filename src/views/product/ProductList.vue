@@ -40,32 +40,36 @@
               </a-dropdown>
             </a-space>
           </template>
+          <template v-if="column.dataIndex === 'proPageImg'">
+            <img style="width: 50%;height: 50%;" :src="record.proPageImg" />
+          </template>
+          <template v-if="column.dataIndex === 'posters'">
+            <img style="width: 50%;height: 50%;" :src="record.posters" />
+          </template>
         </template>
       </a-table>
     </div>
 
     <div class="pagination-container">
-      <a-pagination
-        v-model:current="currentPage"
-        v-model:page-size="pageSize"
-        :total="data.length"
-        show-size-changer
-        @showSizeChange="onShowSizeChange"
-      />
+      <a-pagination v-model:current="currentPage" v-model:page-size="pageSize" :total="currentData.length"
+        show-size-changer @showSizeChange="onShowSizeChange" />
     </div>
     <a-modal v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading" @ok="handleOk">
       <div style="padding: 1%">
         <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
-          <a-form-item label="产品标题">
-            <a-input v-model:value="clickedRecord.proTitle" />
-          </a-form-item>
-          <a-form-item label="产品估价">
-            <a-input v-model:value="clickedRecord.proEvaluate" />
-          </a-form-item>
-          <a-form-item label="产品介绍">
-            <a-input v-model:value="clickedRecord.proIntroduction" type="textarea" />
-          </a-form-item>
-          <!-- 添加其他表单项 -->
+          <template v-for="column in columns">
+            <template v-if="column.key !== 'operation'">
+              <a-form-item :label="column.title" :key="column.key">
+                <!-- For '产品售卖数量' and '推荐指数', display as text if the key is matching -->
+                <template v-if="column.dataIndex === 'soldNumber' || column.dataIndex === 'recNum'">
+                  <span>{{ formState[column.dataIndex] }}</span>
+                </template>
+                <template v-else>
+                  <a-input v-model:value="formState[column.dataIndex]" />
+                </template>
+              </a-form-item>
+            </template>
+          </template>
         </a-form>
       </div>
     </a-modal>
@@ -79,109 +83,113 @@ import { DownOutlined } from '@ant-design/icons-vue';
 import { list } from './Product.api';
 import DatePrice from '../datePrice/datePrice.vue';
 
-const columns = [
-  {
-    title: '产品标题',
-    width: 180,
-    dataIndex: 'proTitle',
-    key: 'proTitle',
-    fixed: 'left',
-  },
-  {
-    title: '产品估价',
-    dataIndex: 'proEvaluate',
-    key: '1',
-    width: 150,
-  },
-  {
-    title: '产品介绍',
-    dataIndex: 'proIntroduction',
-    key: '2',
-    width: 150,
-  },
-  {
-    title: '产品时长',
-    dataIndex: 'proDate',
-    key: '3',
-    width: 150,
-  },
-  {
-    title: '产品封面',
-    dataIndex: 'proPageImg',
-    key: '4',
-    width: 150,
-  },
-  {
-    title: '产品海报',
-    dataIndex: 'posters',
-    key: '5',
-    width: 150,
-  },
-  {
-    title: '成团人数',
-    dataIndex: 'proMan',
-    key: '6',
-    width: 150,
-  },
-  {
-    title: '封面标题',
-    dataIndex: 'proPageTitle',
-    key: '7',
-    width: 150,
-  },
-  {
-    title: '出发地点',
-    dataIndex: 'origin',
-    key: '8',
-    width: 150,
-  },
-  {
-    title: '产品售卖数量',
-    dataIndex: 'soldNumber',
-    key: '9',
-    width: 150,
-  },
-  {
-    title: '产品地点',
-    dataIndex: 'local',
-    key: '10',
-    width: 150,
-  },
-  {
-    title: '详细地点(小标题)',
-    dataIndex: 'localDetail',
-    key: '11',
-    width: 150,
-  },
-  {
-    title: '推荐指数',
-    dataIndex: 'recNum',
-    key: '12',
-    width: 150,
-  },
-  {
-    title: '操作',
-    key: 'operation',
-    fixed: 'right',
-    width: 180,
-  },
-];
+  const columns = [
+    {
+      title: '产品标题',
+      width: 155,
+      dataIndex: 'proTitle',
+      key: '1',
+      fixed: 'left',
+      align: 'center'
+    },
+    {
+      title: '产品估价',
+      dataIndex: 'proEvaluate',
+      key: '2',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品介绍',
+      dataIndex: 'proIntroduction',
+      key: '3',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品时长',
+      dataIndex: 'proDate',
+      key: '4',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品封面',
+      dataIndex: 'proPageImg',
+      key: '5',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品海报',
+      dataIndex: 'posters',
+      key: '6',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '成团人数',
+      dataIndex: 'proMan',
+      key: '7',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '封面标题',
+      dataIndex: 'proPageTitle',
+      key: '8',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '出发地点',
+      dataIndex: 'origin',
+      key: '9',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品售卖数量',
+      dataIndex: 'soldNumber',
+      key: '10',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '产品地点',
+      dataIndex: 'local',
+      key: '11',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '详细地点(小标题)',
+      dataIndex: 'localDetail',
+      key: '12',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '推荐指数',
+      dataIndex: 'recNum',
+      key: '13',
+      width: 150,
+      align: 'center'
+    },
+    {
+      title: '操作',
+      key: 'operation',
+      fixed: 'right',
+      width: 180,
+      align: 'center'
+    },
+  ];
 
-const data = [];
-for (let i = 0; i < 100; i++) {
-  data.push({
-    key: i,
-    recNum: `Edrward ${i}`,
-    localDetail: 32,
-    local: `London Park no. ${i}`,
-  });
-}
-
-const currentPage = ref(1);
-const pageSize = ref(10);
-const visible = ref(false);
-const confirmLoading = ref(false);
-const clickedRecord = ref(null);
+  const currentPage = ref(1);
+  const pageSize = ref(10);
+  const visible = ref(false);
+  const confirmLoading = ref(false);
+  let clickedRecord = ref(null);
 
 const labelCol = reactive({
   style: {
@@ -192,64 +200,57 @@ const wrapperCol = reactive({
   span: 14,
 });
 
-const formState = reactive({
-  proTitle: '',
-  proEvaluate: '',
-  proIntroduction: '',
-  // 添加其他表单项的默认值
-});
+  let formState = reactive(null);
 
-const currentData = computed(() => {
-  const startIndex = (currentPage.value - 1) * pageSize.value;
-  const endIndex = startIndex + pageSize.value;
-  return productList.slice(startIndex, endIndex); // 修改这里
-});
+  const currentData = computed(() => {
+    const startIndex = (currentPage.value - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    return productList.slice(startIndex, endIndex); // 修改这里
+  });
 
-const onShowSizeChange = (current, size) => {
-  pageSize.value = size;
-  currentPage.value = 1;
-};
+  const resetFormState = () => {
+    formState = Object.fromEntries(Object.keys(formState).map(key => [key, '']));
+  };
 
-const showModal = (record) => {
-  if (record) {
-    visible.value = true;
-    clickedRecord.value = { ...record };
-    // 更新表单数据
-    formState.proTitle = record.proTitle;
-    formState.proEvaluate = record.proEvaluate;
-    formState.proIntroduction = record.proIntroduction;
-    // 更新其他表单项的数据
-  } else {
-    // 清空表单数据
-    formState.proTitle = '';
-    formState.proEvaluate = '';
-    formState.proIntroduction = '';
-    // 清空其他表单项的数据
-    visible.value = true;
-  }
-};
+  const onShowSizeChange = (current, size) => {
+    pageSize.value = size;
+    currentPage.value = current || 1;
+  };
 
-const handleOk = () => {
-  confirmLoading.value = true;
-  setTimeout(() => {
-    visible.value = false;
-    confirmLoading.value = false;
-    if (clickedRecord.value) {
-      // 编辑状态下，更新表格数据
-      const index = productList.findIndex((item) => item.key === clickedRecord.value.key);
-      if (index !== -1) {
-        productList[index] = { ...formState };
-      }
+  // 拿到本行记录
+  const showModal = (record) => {
+    if (record) {
+      visible.value = true;
+      clickedRecord.value = { ...record };
+      // 更新表单数据
+      formState = { ...record }
+      // 更新其他表单项的数据
     } else {
-      // 新增状态下，将表单数据添加到表格的第一行
-      productList.unshift({ ...formState, key: productList.length });
+      // 清空表单数据
+      resetFormState();
+      // 清空其他表单项的数据
+      visible.value = true;
     }
-    // 清空表单数据
-    formState.proTitle = '';
-    formState.proEvaluate = '';
-    formState.proIntroduction = '';
-  }, 500);
-};
+  };
+
+  const handleOk = () => {
+    confirmLoading.value = true;
+    setTimeout(() => {
+      visible.value = false;
+      confirmLoading.value = false;
+      if (clickedRecord.value) {
+        const index = productList.findIndex((item) => item.key === clickedRecord.value.key);
+        if (index !== -1) {
+          productList[index] = { ...formState };
+        }
+      } else {
+        // Add a new product to the first row
+        productList.unshift({ ...formState, key: productList.length });
+      }
+      resetFormState();
+    }, 500);
+  };
+
 
 const deleteRow = (record) => {
   const index = productList.findIndex((item) => item.key === record.key);
@@ -328,15 +329,15 @@ const handleCancel = ()=>{
 </script>
 
 <style lang="less">
-.core {
-  margin-top: 1%;
-  background-color: white;
-  padding: 1%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
+  .core {
+    margin-top: 1%;
+    background-color: white;
+    padding: 1%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
 
 .table-container {
   flex: 1;
