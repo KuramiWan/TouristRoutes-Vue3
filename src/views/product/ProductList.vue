@@ -73,8 +73,8 @@
 
                 <!-- For 'proIntroduction', display as textarea -->
                 <template v-else-if="column.dataIndex === 'proIntroduction'">
-                  <a-textarea style=" font-size: 14px; font-weight: 700; padding: 5px;"
-                    v-model:value="formState[column.dataIndex]" />
+                  <textarea class="custom-textarea" v-model="formState[column.dataIndex]"></textarea>
+
                 </template>
                 <!-- For 'proEvaluate', 'proDate', and 'proMan', display as numeric input -->
                 <template v-else>
@@ -93,18 +93,18 @@
       </div>
     </a-modal>
   </div>
-  <a-modal v-model:visible="removeConfirmVisible" title="删除图片" @ok="handleRemoveConfirmOk"
-    @cancel="handleRemoveConfirmCancel">
-    <p>确定要删除该图片吗？</p>
-  </a-modal>
+
 </template>
 
 <script setup>
   import { ref, reactive, computed, onMounted, defineProps } from 'vue';
   import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
-  import { list } from './Product.api';
+  import { message } from 'ant-design-vue';
+  import { getProductList, saveOrUpdate, deleteOne } from './Product.api';
   import { Modal } from 'ant-design-vue';
+  import { createVNode, defineComponent } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
+
 
   const columns = [
     {
@@ -258,6 +258,7 @@
 
   // 拿到本行记录
   const showModal = (record) => {
+    // console.log(record)
     // 有记录就是编辑
     if (record) {
       visible.value = true;
@@ -273,7 +274,33 @@
     }
   };
 
+  /** 编辑逻辑开始**/
+
+  const isFormStateValid = (formState) => {
+    for (const key in formState) {
+      if (formState.hasOwnProperty(key)) {
+        // 排除recNum和soldNumber字段的空值验证
+        if ((key === 'recNum' || key === 'soldNumber') && formState[key] === '') {
+          continue;
+        }
+
+        if (formState[key].trim() === '') {
+          return false; // 如果有任何一个属性值为空，则返回false
+        }
+      }
+    }
+    return true; // 如果所有属性值都不为空，则返回true
+  };
+
+  const error = () => {
+    message.error('不允许有空值！！！');
+  };
   const handleOk = () => {
+    if (!isFormStateValid(formState)) {
+      // 如果有任何属性值为空，不允许上传
+      error();
+      return;
+    }
     confirmLoading.value = true;
     setTimeout(() => {
       visible.value = false;
@@ -282,6 +309,8 @@
         const index = productList.findIndex((item) => item.key === clickedRecord.value.key);
         if (index !== -1) {
           productList[index] = { ...formState };
+          // 执行新增接口
+          saveOrUpdate({ formState: formState });
         }
       } else {
         // Add a new product to the first row
@@ -291,22 +320,46 @@
     }, 500);
   };
 
+  /** 编辑逻辑结束**/
 
+
+  /** 删除逻辑开始**/
   const deleteRow = (record) => {
-    const index = productList.findIndex((item) => item.key === record.key);
+    const index = productList.findIndex((item) => item.id === record.id);
     if (index !== -1) {
+      handleDelete(record);
       productList.splice(index, 1);
     }
   };
 
+  /**
+ * 删除事件
+ */
+  async function handleDelete(record) {
+
+    await deleteOne({ id: record.id }, handleSuccess);
+  }
+  /**
+ * 成功回调
+ */
+  function handleSuccess() {
+    console.log("删除成功")
+  }
+  /** 删除逻辑结束**/
+
+
+  /** 添加逻辑开始**/
   const addProduct = () => {
     showModal();
+    saveOrUpdate({ formState: formState })
   };
+  /** 添加逻辑结束**/
 
+  /** 查询逻辑开始**/
   onMounted(async () => {
     try {
       // 从服务器获取产品列表综合
-      const response = await list({});
+      const response = await getProductList({});
       // response.records是所有信息，根据这个筛选
       console.log(response.records);
       response.records.forEach(record => {
@@ -347,6 +400,7 @@
       console.error('获取产品列表数据时出错：', error);
     }
   });
+  /** 查询逻辑结束**/
 
   const open = ref(false);
   const childRef = ref();
@@ -400,5 +454,22 @@
     outline: 0;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+  }
+
+  .custom-textarea {
+    outline-style: none;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 5px;
+    width: 300px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .custom-textarea:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
   }
 </style>
