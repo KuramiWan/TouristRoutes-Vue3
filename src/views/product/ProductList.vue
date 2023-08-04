@@ -47,31 +47,54 @@
     </div>
     <a-modal v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading" @ok="handleOk">
       <div style="padding: 1%;">
+
         <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
           <template v-for="column in columns">
             <template v-if="column.key !== 'operation'">
               <a-form-item :label="column.title" :key="column.key">
                 <!-- For '产品售卖数量' and '推荐指数', display as text if the key is matching -->
                 <template v-if="column.dataIndex === 'soldNumber' || column.dataIndex === 'recNum'">
-                  <span>{{ formState[column.dataIndex] }}</span>
+                  <span style=" font-size: 14px; font-weight: 700;">{{ formState[column.dataIndex] }}</span>
                 </template>
+
+                <!-- For 'proPageImg' or 'posts', display as image upload box -->
+                <template v-else-if="column.dataIndex === 'proPageImg' || column.dataIndex === 'posters'">
+
+                </template>
+
+                <!-- For 'proIntroduction', display as textarea -->
+                <template v-else-if="column.dataIndex === 'proIntroduction'">
+                  <a-textarea style=" font-size: 14px; font-weight: 700; padding: 5px;"
+                    v-model:value="formState[column.dataIndex]" />
+                </template>
+                <!-- For 'proEvaluate', 'proDate', and 'proMan', display as numeric input -->
                 <template v-else>
-                  <a-input v-model:value="formState[column.dataIndex]" />
+                  <!-- 数字判定。。。。。。。。。 -->
+                  <input
+                    v-if="column.dataIndex === 'proEvaluate' || column.dataIndex === 'proDate' || column.dataIndex === 'proMan'"
+                    v-model="formState[column.dataIndex]" />
+                  <!-- For other fields, display as regular input box -->
+                  <input v-else v-model="formState[column.dataIndex]" />
                 </template>
               </a-form-item>
             </template>
           </template>
         </a-form>
+
       </div>
     </a-modal>
   </div>
+  <a-modal v-model:visible="removeConfirmVisible" title="删除图片" @ok="handleRemoveConfirmOk"
+    @cancel="handleRemoveConfirmCancel">
+    <p>确定要删除该图片吗？</p>
+  </a-modal>
 </template>
 
 <script setup>
-  import { ref, reactive, computed, onMounted } from 'vue';
-  import { defineProps } from 'vue';
-  import { DownOutlined } from '@ant-design/icons-vue';
+  import { ref, reactive, computed, onMounted, defineProps } from 'vue';
+  import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import { list } from './Product.api';
+  import { Modal } from 'ant-design-vue';
 
   const columns = [
     {
@@ -179,7 +202,11 @@
   const pageSize = ref(10);
   const visible = ref(false);
   const confirmLoading = ref(false);
+
+  // 点击记录
   let clickedRecord = ref(null);
+  // 表单数据
+  let formState = reactive(null);
 
   const labelCol = reactive({
     style: {
@@ -190,16 +217,28 @@
     span: 14,
   });
 
-  let formState = reactive(null);
-
   const currentData = computed(() => {
-    const startIndex = (currentPage.value - 1) * pageSize.value;
-    const endIndex = startIndex + pageSize.value;
-    return productList.slice(startIndex, endIndex); // 修改这里
+    return productList;
   });
 
+  // 请求返回的数据
+  const productList = reactive([]);
+  const batchPackage = reactive([]);
+  const priceDate = reactive([]);
+  const journeyPackage = reactive([]);
+  const schedules = reactive([]);
+
+  // 清空表单数据
   const resetFormState = () => {
-    formState = Object.fromEntries(Object.keys(formState).map(key => [key, '']));
+    if (formState) {
+      let keys = Object.keys(formState);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        formState[key] = '';
+      }
+    } else {
+      console.log('出错了，请刷新！！！')
+    }
   };
 
   const onShowSizeChange = (current, size) => {
@@ -209,16 +248,17 @@
 
   // 拿到本行记录
   const showModal = (record) => {
+    // 有记录就是编辑
     if (record) {
       visible.value = true;
       clickedRecord.value = { ...record };
       // 更新表单数据
       formState = { ...record }
-      // 更新其他表单项的数据
     } else {
-      // 清空表单数据
+      // 没有记录就是新增
+      // 先清空或者重构
+      formState = { ...productList[0] }
       resetFormState();
-      // 清空其他表单项的数据
       visible.value = true;
     }
   };
@@ -253,12 +293,6 @@
     showModal();
   };
 
-  const productList = reactive([]);
-  const batchPackage = reactive([]);
-  const priceDate = reactive([]);
-  const journeyPackage = reactive([]);
-  const schedules = reactive([]);
-
   onMounted(async () => {
     try {
       // 从服务器获取产品列表综合
@@ -267,20 +301,20 @@
       console.log(response.records);
       response.records.forEach(record => {
         let product = reactive({
-          id: record.id || null,
-          local: record.local || null,
-          localDetail: record.localDetail || null,
-          origin: record.origin || null,
-          posters: record.posters || null,
-          proDate: record.proDate || null,
+          proTitle: record.proTitle || null,
           proEvaluate: record.proEvaluate || null,
           proIntroduction: record.proIntroduction || null,
-          proMan: record.proMan || null,
+          proDate: record.proDate || null,
           proPageImg: record.proPageImg || null,
+          posters: record.posters || null,
+          proMan: record.proMan || null,
           proPageTitle: record.proPageTitle || null,
-          proTitle: record.proTitle || null,
-          recNum: record.recNum || null,
+          origin: record.origin || null,
           soldNumber: record.soldNumber || null,
+          local: record.local || null,
+          localDetail: record.localDetail || null,
+          recNum: record.recNum || null,
+          id: record.id || null,
         });
         // 产品封装
         productList.push(product);
@@ -326,5 +360,22 @@
   .pagination-container {
     position: relative;
     margin-top: 1rem;
+  }
+
+  input {
+    outline-style: none;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 5px;
+    width: 300px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  input:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
   }
 </style>
