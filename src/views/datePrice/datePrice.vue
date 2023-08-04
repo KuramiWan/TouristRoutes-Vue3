@@ -247,7 +247,7 @@ const handleAdd = () => {
     pdDate: date,
     pdPrice: 0,
     pdEnrollment: 0,
-    pdMaxMan: 0,
+    pdMaxMan: 1,
   }
 
   var newId : string
