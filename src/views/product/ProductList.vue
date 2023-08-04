@@ -2,7 +2,8 @@
   <div class="core">
     <a-button style="margin-bottom: 1%" type="primary" @click="addProduct">新增产品</a-button>
     <div class="table-container">
-      <a-table bordered :pagination="false" :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 300 }">
+      <a-table bordered :pagination="false" :columns="columns" :data-source="currentData"
+        :scroll="{ x: 1500, y: 1500 }">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'operation'">
             <a-space>
@@ -41,11 +42,8 @@
               </a-dropdown>
             </a-space>
           </template>
-          <template v-if="column.dataIndex === 'proPageImg'">
-            <img style="width: 50%;height: 50%;" :src="record.proPageImg" />
-          </template>
-          <template v-if="column.dataIndex === 'posters'">
-            <img style="width: 50%;height: 50%;" :src="record.posters" />
+          <template v-if="column.dataIndex === 'proPageImg'||column.dataIndex === 'posters'">
+            <img style="width: 50%;height: 50%;" :src="record[column.dataIndex]" />
           </template>
         </template>
       </a-table>
@@ -54,7 +52,8 @@
       <a-pagination v-model:current="currentPage" v-model:page-size="pageSize" :total="currentData.length"
         show-size-changer @showSizeChange="onShowSizeChange" />
     </div>
-    <a-modal v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading" @ok="handleOk">
+    <a-modal :body-style="bodystyle" v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading"
+      @ok="handleOk">
       <div style="padding: 1%;">
 
         <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
@@ -74,7 +73,6 @@
                 <!-- For 'proIntroduction', display as textarea -->
                 <template v-else-if="column.dataIndex === 'proIntroduction'">
                   <textarea class="custom-textarea" v-model="formState[column.dataIndex]"></textarea>
-
                 </template>
                 <!-- For 'proEvaluate', 'proDate', and 'proMan', display as numeric input -->
                 <template v-else>
@@ -105,7 +103,11 @@
   import { createVNode, defineComponent } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
 
-
+  const bodystyle = {
+    height: '480px',
+    overflow: 'hidden',
+    overflowY: 'scroll',
+  }
   const columns = [
     {
       title: '产品标题',
@@ -119,84 +121,84 @@
       title: '产品估价',
       dataIndex: 'proEvaluate',
       key: '2',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品介绍',
       dataIndex: 'proIntroduction',
       key: '3',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品时长',
       dataIndex: 'proDate',
       key: '4',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品封面',
       dataIndex: 'proPageImg',
       key: '5',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品海报',
       dataIndex: 'posters',
       key: '6',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '成团人数',
       dataIndex: 'proMan',
       key: '7',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '封面标题',
       dataIndex: 'proPageTitle',
       key: '8',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '出发地点',
       dataIndex: 'origin',
       key: '9',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品售卖数量',
       dataIndex: 'soldNumber',
       key: '10',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '产品地点',
       dataIndex: 'local',
       key: '11',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '详细地点(小标题)',
       dataIndex: 'localDetail',
       key: '12',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
       title: '推荐指数',
       dataIndex: 'recNum',
       key: '13',
-      width: 150,
+      width: 155,
       align: 'center'
     },
     {
@@ -309,12 +311,14 @@
         const index = productList.findIndex((item) => item.key === clickedRecord.value.key);
         if (index !== -1) {
           productList[index] = { ...formState };
-          // 执行新增接口
+          // 执行编辑
           saveOrUpdate({ formState: formState });
         }
       } else {
         // Add a new product to the first row
         productList.unshift({ ...formState, key: productList.length });
+        // 执行新增
+
       }
       resetFormState();
     }, 500);
@@ -351,7 +355,7 @@
   /** 添加逻辑开始**/
   const addProduct = () => {
     showModal();
-    saveOrUpdate({ formState: formState })
+    // saveOrUpdate({ formState: formState })
   };
   /** 添加逻辑结束**/
 
@@ -474,19 +478,21 @@
   }
 
   .full-modal {
-  .ant-modal {
-    max-width: 100%;
-    top: 0;
-    padding-bottom: 0;
-    margin: 0;
+    .ant-modal {
+      max-width: 100%;
+      top: 0;
+      padding-bottom: 0;
+      margin: 0;
+    }
+
+    .ant-modal-content {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh);
+    }
+
+    .ant-modal-body {
+      flex: 1;
+    }
   }
-  .ant-modal-content {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh);
-  }
-  .ant-modal-body {
-    flex: 1;
-  }
-}
 </style>
