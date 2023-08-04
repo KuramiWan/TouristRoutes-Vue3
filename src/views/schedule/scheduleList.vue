@@ -1,94 +1,62 @@
 <template>
   <div>
     <a-button type="primary" @click="showModal">点击查看日程</a-button>
-    <a-modal v-model:visible="visible" title="产品日程" width="100%" wrap-class-name="full-modal" @ok="handleOk">
+    <a-modal v-model:visible="visible" title="产品日程" width="100%" wrap-class-name="full-modal" @ok="handleOk" ok-text="确定">
       <div class="schedule-content">
         <template v-if="schedules.length !== 0">
           <template v-for="(schedule, index) in schedules" :key="schedule.id">
             <a-card style="width: 100%">
-              <!-- 日程标题 -->
-              <div class="schedule-content-head">
-                <div
-                  ><span>第{{ index + 1 }}天</span><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ schedule.schTitle }}</span></div
-                >
-                <div>
-                  <a-button type="primary" style="margin-right: 10px" @click="showEditSchedule(schedule)"><div>编辑日程</div></a-button>
-                  <a-popconfirm
-                    title="你确定要删除吗?"
-                    ok-text="确定"
-                    cancel-text="取消"
-                    @confirm="confirmScheduleDelete"
-                    @cancel="confirmScheduleDelete"
+              <a-card-grid style="width: 100%">
+                <!-- 日程标题 -->
+                <div class="schedule-content-head">
+                  <div
+                    ><span>第{{ index + 1 }}天</span><span>&nbsp;&nbsp;&nbsp;&nbsp;{{ schedule.schTitle }}</span></div
                   >
-                    <a-button type="danger" style="margin-right: 10px"><div>删除日程</div></a-button>
-                  </a-popconfirm>
+                  <div>
+                    <a-button type="primary" style="margin-right: 10px" @click="showEditSchedule(schedule)"><div>编辑</div></a-button>
+                    <a-popconfirm
+                      title="你确定要删除吗?"
+                      ok-text="确定"
+                      cancel-text="取消"
+                      @confirm="confirmScheduleDelete(index)"
+                      @cancel="cancelScheduleDelete"
+                    >
+                      <a-button type="danger" style="margin-right: 10px"><div>删除</div></a-button>
+                    </a-popconfirm>
+                  </div>
                 </div>
-              </div>
-              <!-- 任务卡片 -->
-              <a-card style="width: 100%; margin-top: 14px">
-                <template v-if="schedule.tasks.length !== 0">
-                  <!-- 展示第一个任务的时间线 -->
-                  <a-timeline v-if="!openIndex[index]">
-                    <a-timeline-item>
-                      <template #dot>
-                        <div style="display: flex; justify-content: center">
-                          <img v-if="schedule.tasks[0].taskTitle == '交通'" class="schedule-icon" src="../../assets/images/交通.png" />
-                          <img v-if="schedule.tasks[0].taskTitle == '酒店'" class="schedule-icon" src="../../assets/images/酒店.png" />
-                          <img
-                            v-if="
-                              schedule.tasks[0].taskTitle == '早餐' || schedule.tasks[0].taskTitle == '午餐' || schedule.tasks[0].taskTitle == '晚餐'
-                            "
-                            class="schedule-icon"
-                            src="../../assets/images/餐饮.png"
-                          />
-                          <img v-if="schedule.tasks[0].taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
-                          <img v-if="schedule.tasks[0].taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
-                        </div>
-                        <div>{{ schedule.tasks[0].taskDate }}</div>
-                      </template>
-                      <div>
-                        <div class="task-title">{{ schedule.tasks[0].taskTitle }}</div>
-                        <div>{{ schedule.tasks[0].taskContent }}</div>
-                        <div>
-                          <a-image-preview-group>
-                            <template v-if="schedule.tasks[0].taskImgs != null">
-                              <div class="task-img-group">
-                                <template v-for="(img, imgIndex) in schedule.tasks[0].taskImgs" :key="imgIndex">
-                                  <a-image :width="200" :src="img" />
-                                </template>
-                              </div>
-                            </template>
-                          </a-image-preview-group>
-                        </div>
-                      </div>
-                    </a-timeline-item>
-                  </a-timeline>
-                  <!-- 展示所有时间线 -->
-                  <a-timeline v-if="openIndex[index]">
-                    <template v-for="task in schedule.tasks" :key="task.id">
+                <!-- 任务卡片 -->
+                <a-card style="width: 100%; margin-top: 14px; padding: 20px">
+                  <template v-if="schedule.tasks.length !== 0">
+                    <!-- 展示第一个任务的时间线 -->
+                    <a-timeline v-if="!openIndex[index]">
                       <a-timeline-item>
                         <template #dot>
                           <div style="display: flex; justify-content: center">
-                            <img v-if="task.taskTitle == '交通'" class="schedule-icon" src="../../assets/images/交通.png" />
-                            <img v-if="task.taskTitle == '酒店'" class="schedule-icon" src="../../assets/images/酒店.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '交通'" class="schedule-icon" src="../../assets/images/交通.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '酒店'" class="schedule-icon" src="../../assets/images/酒店.png" />
                             <img
-                              v-if="task.taskTitle == '早餐' || task.taskTitle == '午餐' || task.taskTitle == '晚餐'"
+                              v-if="
+                                schedule.tasks[0].taskTitle == '早餐' ||
+                                schedule.tasks[0].taskTitle == '午餐' ||
+                                schedule.tasks[0].taskTitle == '晚餐'
+                              "
                               class="schedule-icon"
                               src="../../assets/images/餐饮.png"
                             />
-                            <img v-if="task.taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
-                            <img v-if="task.taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
                           </div>
-                          <div>{{ task.taskDate }}</div>
+                          <div>{{ schedule.tasks[0].taskDate }}</div>
                         </template>
                         <div>
-                          <div class="task-title">{{ task.taskTitle }}</div>
-                          <div>{{ task.taskContent }}</div>
+                          <div class="task-title">{{ schedule.tasks[0].taskTitle }}</div>
+                          <div>{{ schedule.tasks[0].taskContent }}</div>
                           <div>
                             <a-image-preview-group>
-                              <template v-if="task.taskImgs != null">
+                              <template v-if="schedule.tasks[0].taskImgs != null">
                                 <div class="task-img-group">
-                                  <template v-for="(img, imgIndex) in task.taskImgs" :key="imgIndex">
+                                  <template v-for="(img, imgIndex) in schedule.tasks[0].taskImgs" :key="imgIndex">
                                     <a-image :width="200" :src="img" />
                                   </template>
                                 </div>
@@ -97,22 +65,58 @@
                           </div>
                         </div>
                       </a-timeline-item>
-                    </template>
-                  </a-timeline>
-                  <!-- 是否展开 -->
-                  <div style="display: flex; justify-content: center; align-content: center">
-                    <a-button @click="fold(index)"
-                      >展开
-                      <template v-if="!openIndex[index]">
-                        <down-outlined />
+                    </a-timeline>
+                    <!-- 展示所有时间线 -->
+                    <a-timeline v-if="openIndex[index]">
+                      <template v-for="task in schedule.tasks" :key="task.id">
+                        <a-timeline-item>
+                          <template #dot>
+                            <div style="display: flex; justify-content: center">
+                              <img v-if="task.taskTitle == '交通'" class="schedule-icon" src="../../assets/images/交通.png" />
+                              <img v-if="task.taskTitle == '酒店'" class="schedule-icon" src="../../assets/images/酒店.png" />
+                              <img
+                                v-if="task.taskTitle == '早餐' || task.taskTitle == '午餐' || task.taskTitle == '晚餐'"
+                                class="schedule-icon"
+                                src="../../assets/images/餐饮.png"
+                              />
+                              <img v-if="task.taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
+                              <img v-if="task.taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
+                            </div>
+                            <div>{{ task.taskDate }}</div>
+                          </template>
+                          <div>
+                            <div class="task-title">{{ task.taskTitle }}</div>
+                            <div>{{ task.taskContent }}</div>
+                            <div>
+                              <a-image-preview-group>
+                                <template v-if="task.taskImgs != null">
+                                  <div class="task-img-group">
+                                    <template v-for="(img, imgIndex) in task.taskImgs" :key="imgIndex">
+                                      <a-image :width="200" :src="img" />
+                                    </template>
+                                  </div>
+                                </template>
+                              </a-image-preview-group>
+                            </div>
+                          </div>
+                        </a-timeline-item>
                       </template>
-                      <template v-if="openIndex[index]">
-                        <up-outlined />
-                      </template>
-                    </a-button>
-                  </div>
-                </template>
-              </a-card>
+                    </a-timeline>
+                    <!-- 是否展开 -->
+                    <div style="display: flex; justify-content: center; align-content: center">
+                      <a-button @click="fold(index)"
+                        >展开
+                        <template v-if="!openIndex[index]">
+                          <down-outlined />
+                        </template>
+                        <template v-if="openIndex[index]">
+                          <up-outlined />
+                        </template>
+                      </a-button>
+                    </div>
+                  </template>
+                </a-card>
+              </a-card-grid>
             </a-card>
           </template>
         </template>
@@ -126,6 +130,9 @@
             </a-empty>
           </a-card>
         </template>
+        <div class="add-schedule">
+          <a-button type="primary" @click="addSchedule"> <plus-outlined />添加日程 </a-button>
+        </div>
       </div>
       <EditSchedule :editScheduleVisible="editScheduleVisible" :schedule="mySchedule" @changeVisible="changeVisible" />
     </a-modal>
@@ -133,8 +140,8 @@
 </template>
 
 <script lang="ts">
-  import { DownOutlined, UpOutlined } from '@ant-design/icons-vue';
-  import { getProductList } from './api/index';
+  import { DownOutlined, UpOutlined, PlusOutlined } from '@ant-design/icons-vue';
+  import { getProductList, deleteScheduleAndTask, addScheduleByProId } from './api/index';
   import { defineComponent, ref } from 'vue';
 
   import EditSchedule from './components/editSchedule.vue';
@@ -143,11 +150,13 @@
       DownOutlined,
       UpOutlined,
       EditSchedule,
+      PlusOutlined,
     },
     setup() {
       const openIndex = ref<any>([]);
       const visible = ref<boolean>(false);
       const editScheduleVisible = ref<boolean>(false);
+      const productInfo = ref<any>();
       const schedules = ref<any>([]);
       const mySchedule = ref<any>();
       const tasks = ref<any>([]);
@@ -155,7 +164,7 @@
       const showModal = () => {
         openIndex.value = [];
         let params = {
-          id: '1680280351362117633',
+          id: '66',
         };
 
         getProductList(params).then((res) => {
@@ -163,6 +172,7 @@
           for (let i = 0; i < res.schedules.length; i++) {
             openIndex.value.push(false);
           }
+          productInfo.value = res;
           schedules.value = res.schedules;
           visible.value = true;
         });
@@ -173,8 +183,11 @@
         visible.value = false;
       };
 
-      const confirmScheduleDelete = (e: MouseEvent) => {
-        console.log(e);
+      const confirmScheduleDelete = async (index) => {
+        console.log('delete schedule ===', schedules.value[index]);
+        await deleteScheduleAndTask(schedules.value[index]);
+        // 从schedules数组中移除
+        schedules.value.splice(index, 1);
       };
 
       const cancelScheduleDelete = (e: MouseEvent) => {
@@ -198,6 +211,19 @@
         openIndex.value[index] = !openIndex.value[index];
       };
 
+      const addSchedule = async () => {
+        let data = {
+          proId: productInfo.value.id,
+        };
+        const res = await addScheduleByProId(data);
+        schedules.value.push({
+          id: res[0],
+          schTitle: null,
+          tasks: [],
+          proId: productInfo.value.id,
+        });
+      };
+
       return {
         visible,
         showModal,
@@ -206,13 +232,24 @@
         confirmScheduleDelete,
         schedules,
         mySchedule,
+        productInfo,
         tasks,
         openIndex,
         fold,
         showEditSchedule,
         changeVisible,
         editScheduleVisible,
+        addSchedule,
       };
+    },
+    watch: {
+      productInfo(newValue) {
+        this.productInfo = newValue;
+        console.log('this.productInfo', this.productInfo);
+      },
+      schedules(newValue) {
+        this.schedules = newValue;
+      },
     },
   });
 </script>
@@ -275,5 +312,6 @@
     display: flex;
     justify-content: center;
     align-content: center;
+    margin-top: 15px;
   }
 </style>

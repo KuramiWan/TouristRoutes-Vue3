@@ -3,8 +3,12 @@ import { defHttp } from '/@/utils/http/axios';
 
 enum Api {
   productList = '/core/product/queryById?',
-  schedulesList = '/core/schedule/queryListByProId',
-  tasksList = '/core/task/queryAllByProId',
+  editSchedule = '/core/schedule/edit',
+  andOrEdit = '/core/schedule/addOrEdit',
+  deleteTaskById = '/core/task/delete',
+  deleteScheduleAndTask = '/core/schedule/deleteById',
+  addScheduleByProId = '/core/schedule/addByProId',
+  uploadTaskImg = '/core/task/uploadTaskImg',
 }
 
 /**
@@ -13,4 +17,52 @@ enum Api {
  */
 export const getProductList = (params) => {
   return defHttp.get({ url: Api.productList, params });
+};
+
+/**
+ * 根据日程id编辑产品日程
+ * @param data
+ */
+export const editScheduleById = (data) => {
+  return defHttp.post({ url: Api.editSchedule, data });
+};
+
+/**
+ * 编辑or新增日程和任务
+ * @param data
+ */
+export const andOrEditScheduleAndTask = (data) => {
+  return defHttp.post({ url: Api.andOrEdit, data });
+};
+
+/**
+ * 根据id删除某个任务
+ * @param data
+ */
+export const deleteTask = (data) => {
+  return defHttp.delete({ url: Api.deleteTaskById, data });
+};
+
+/**
+ * 通过日程id删除日程和相关任务
+ * @param data
+ */
+export const deleteScheduleAndTask = (data) => {
+  return defHttp.delete({ url: Api.deleteScheduleAndTask, data });
+};
+
+/**
+ * 通过产品id添加日程
+ * @param data
+ */
+export const addScheduleByProId = (data) => {
+  return defHttp.post({ url: Api.addScheduleByProId, data });
+};
+
+/**
+ * 上传图片返回url
+ * @param data
+ */
+export const uploadTaskImg = (data) => {
+  return defHttp.post({ url: Api.uploadTaskImg, data });
 };

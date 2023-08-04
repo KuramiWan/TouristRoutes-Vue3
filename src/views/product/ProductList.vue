@@ -1,6 +1,6 @@
 <template>
   <div class="core">
-    <a-button style="margin-bottom: 1%;" type="primary" @click="addProduct">新增产品</a-button>
+    <a-button style="margin-bottom: 1%" type="primary" @click="addProduct">新增产品</a-button>
     <div class="table-container">
       <a-table bordered :pagination="false" :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 300 }">
         <template #bodyCell="{ column, record }">
@@ -36,11 +36,16 @@
       </a-table>
     </div>
     <div class="pagination-container">
-      <a-pagination v-model:current="currentPage" v-model:page-size="pageSize" :total="data.length" show-size-changer
-        @showSizeChange="onShowSizeChange" />
+      <a-pagination
+        v-model:current="currentPage"
+        v-model:page-size="pageSize"
+        :total="data.length"
+        show-size-changer
+        @showSizeChange="onShowSizeChange"
+      />
     </div>
     <a-modal v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading" @ok="handleOk">
-      <div style="padding: 1%;">
+      <div style="padding: 1%">
         <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
           <a-form-item label="产品标题">
             <a-input v-model:value="clickedRecord.proTitle" />
@@ -259,7 +264,7 @@
       const response = await list({});
       // response.records是所有信息，根据这个筛选
       console.log(response.records);
-      response.records.forEach(record => {
+      response.records.forEach((record) => {
         let product = reactive({
           id: record.id || null,
           local: record.local || null,
@@ -297,7 +302,6 @@
       console.error('获取产品列表数据时出错：', error);
     }
   });
-
 </script>
 
 <style scoped>
