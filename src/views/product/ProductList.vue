@@ -1,6 +1,6 @@
 <template>
   <div class="core">
-    <a-button style="margin-bottom: 1%;" type="primary" @click="addProduct">新增产品</a-button>
+    <a-button style="margin-bottom: 1%" type="primary" @click="addProduct">新增产品</a-button>
     <div class="table-container">
       <a-table bordered :pagination="false" :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 300 }">
         <template #bodyCell="{ column, record }">
@@ -19,7 +19,16 @@
                       <a>日程详情</a>
                     </a-menu-item>
                     <a-menu-item>
-                      <a>每日价格</a>
+                      <a-button @click="showBigModal" type="text">日程价格</a-button>
+                      <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal"
+                        cancelText="关闭" :footer="null">
+                        <DatePrice ref="childRef" :ProId="record.id" />
+
+                        <template slot="footer">
+                          <a-button @click="handleCancel">关闭</a-button>
+                        </template>
+
+                      </a-modal>
                     </a-menu-item>
                     <a-menu-item>
                       <a>批次套餐</a>
@@ -95,6 +104,7 @@
   import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import { list } from './Product.api';
   import { Modal } from 'ant-design-vue';
+  import DatePrice from '../datePrice/datePrice.vue';
 
   const columns = [
     {
@@ -337,6 +347,19 @@
       console.error('获取产品列表数据时出错：', error);
     }
   });
+
+  const open = ref(false);
+  const childRef = ref();
+  const getChild = () => {
+    // 第三步： 调用子组件的方法或者变量，通过value
+    childRef.value.commitSave('1683715194473160706');
+  };
+  const showBigModal = () => {
+    open.value = true;
+  };
+  const handleCancel = () => {
+    open.value = false;
+  }
 
 </script>
 

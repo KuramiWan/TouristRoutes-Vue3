@@ -1,8 +1,7 @@
 <template>
     <div>
-      <context-holder />
-        <a-button type="primary" style="margin-bottom: 8px" @click="handleAdd">添加日程</a-button>
-        <a-button danger  style="margin-bottom: 8px;float:right; margin-right: 10px;" @click="commitSave">保存</a-button>
+        <a-button type="primary" style="margin: 5px 5px;" @click="handleAdd">添加日程</a-button>
+        <a-button type="primary" danger style="width: 150px;margin: 5px 20px;float:right; margin-right: 10px;" @click="commitSave">保存</a-button>
         <a-table bordered :data-source="dataSource" :columns="columns">
     <template #bodyCell="{ column, text, record }">
       <template v-if="column.dataIndex === 'date'">
@@ -38,7 +37,8 @@
             <check-outlined @click="save3(record.key)" />
           </div>
           <div v-else >
-            {{ text || 0 }}人
+            <span style="color: red;" v-if="record.thatDay == record.maxMan">{{ text || 0 }}人</span>
+            <span v-else>{{ text || 0 }}人</span>
             <edit-outlined @click="edit3(record.key)" />
           </div>
         </div>
@@ -51,7 +51,8 @@
             <check-outlined @click="save4(record.key)" />
           </div>
           <div v-else >
-            {{ text || 0 }}人
+            <span style="color: red;" v-if="record.thatDay == record.maxMan">{{ text || 0 }}人</span>
+            <span v-else>{{ text || 0 }}人</span>
             <edit-outlined @click="edit4(record.key)" />
           </div>
         </div>
@@ -68,6 +69,11 @@
       </template>
     </template>
   </a-table>
+  <a-alert style="width: 100%;text-align: center;font-weight: bold;font-size: 15px;"
+      message="修改后请记得保存或确认"
+      type="warning"
+      closable
+    />
     </div>
 </template>
 
@@ -75,10 +81,13 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import type { Ref, UnwrapRef } from 'vue';
 import { message } from 'ant-design-vue';
-import { CheckOutlined, EditOutlined } from '@ant-design/icons-vue';
+import { CheckOutlined, EditOutlined,ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { createVNode } from 'vue';
+import { Modal } from 'ant-design-vue';
 import { cloneDeep } from 'lodash-es';
 import { getDatePrice,deleteDatePrice,addDatePrice,updateDatePrice } from './api/api';
 import { number, string } from 'vue-types';
+import { error } from 'console';
 // import axios from 'axios';
 
 interface DataItem {
@@ -99,8 +108,11 @@ interface PriceDate{
       pdMaxMan: number;
 }
 
+
+const props = defineProps(['ProId'])
+
 var params={
-    proId : "1683715194473160706"
+    proId : props.ProId
   }
 const datePrice : Ref<DataItem[]> = ref([])
 onMounted(()=>{
@@ -133,8 +145,9 @@ const columns = [
     dataIndex: 'price',
   },
   {
-    title: '当天报名人数',
+    title: '当天报名人数(注：当天报名人数 <= 最多报名人数)',
     dataIndex: 'thatDay',
+    width:"27%"
   },
   {
     title: '最多报名人数',
@@ -175,6 +188,7 @@ editableData4[key] = cloneDeep(dataSource.value.filter(item => key === item.key)
 const save = (key: string) => {
   Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData[key]);
   console.log(dataSource.value[key].date)
+  console.log("ProId",props.ProId)
   delete editableData[key];
   // return false;
 };
@@ -184,14 +198,28 @@ const save2 = (key: string) => {
     delete editableData2[key];
 };
 const save3 = (key: string) => {
+    const item = dataSource.value.filter(item => key === item.key)[0];
+    if(editableData3[key].thatDay < 0 || item.maxMan < editableData3[key].thatDay){
+      message.error("数据填写错误！！！")
+      delete editableData3[key];
+    }else{
     Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData3[key]);
     console.log(dataSource.value[key])
-    delete editableData3[key];
+    delete editableData3[key]
+    }
+    
+    
 };
 const save4 = (key: string) => {
+  const item = dataSource.value.filter(item => key === item.key)[0];
+    if(editableData4[key].maxMan < 0 || item.thatDay > editableData4[key].maxMan){
+      message.error("数据填写错误！！！")
+      delete editableData4[key];
+    }else{
     Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData4[key]);
     console.log(dataSource.value[key])
-    delete editableData4[key];
+    delete editableData4[key]
+    }
 };
 
 const onDelete = (key: string) => {
@@ -219,7 +247,7 @@ const handleAdd = () => {
     pdDate: date,
     pdPrice: 0,
     pdEnrollment: 0,
-    pdMaxMan: 0,
+    pdMaxMan: 1,
   }
 
   var newId : string
@@ -239,9 +267,17 @@ const handleAdd = () => {
   console.log(dataSource.value)
   });
 };
+
 const priceDates: Ref<PriceDate[]> = ref([])
-const commitSave = () => {
-    dataSource.value.forEach(element => {
+ const commitSave = () => {
+  
+  Modal.confirm({
+    title: '确定要保存吗',
+    icon: createVNode(ExclamationCircleOutlined),
+    content: '保存修改的所有内容',
+    onOk() {
+      return new Promise((resolve, reject) => {
+      dataSource.value.forEach(element => {
       const priceDate = {
       id:element.id,
       proId: params.proId,
@@ -255,13 +291,17 @@ const commitSave = () => {
     console.log(priceDates.value)
     updateDatePrice(priceDates.value).then(()=>{
       getDatePrice(params)
-    })
+    })  
+        setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
+        return true;
+      }).catch(() => console.log('错误'));
+    },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onCancel() {return false},
+  });    
   }
 
 </script>
 
-<style lang="less" scoped>
-  .editable-add-btn {
-    margin: 10px 5px;
-  }
+<style lang="less">
 </style>
