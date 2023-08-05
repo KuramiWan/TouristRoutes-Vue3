@@ -4,7 +4,8 @@
     <a-button style="margin-bottom: 1%" type="primary" @click="showModal">新增产品</a-button>
     <!-- 整个产品表格 -->
     <div class="table-container">
-      <a-table bordered :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 1500 }">
+      <a-table bordered :columns="columns" :pagination="false" :data-source="currentData"
+        :scroll="{ x: 1500, y: 1500 }">
         <template #bodyCell="{ column, record }">
           <!-- 操作单元格 -->
           <template v-if="column.dataIndex === 'operation'">
@@ -316,8 +317,6 @@
   /**---------------------------------------表单--------------------------------------------------**/
   // 创建表单对象，将点击的那一行的产品数据封装到表单
   let formState = ref(null);
-  // 展示模态窗口之后，将行记录保存下来
-  // let outerRecord = ref(null);
   // 表单的静态属性
   const labelCol = ref({
     style: {
@@ -417,7 +416,6 @@
       visible.value = true;
       // 更新表单数据
       formState.value = { ...record };
-      // outerRecord = record;
       pageImg.value = []
       posterImg.value = []
       pageImg.value.push({
