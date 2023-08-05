@@ -51,6 +51,13 @@
         </template>
       </a-table>
     </div>
+
+    <!-- 分页组件 -->
+    <div class="paginationCom">
+      <a-pagination size="small" @change="changePage(current)" v-model:pageSize="pageSize" v-model:current="current"
+        :total="total" />
+    </div>
+
     <!-- 编辑或者新增，弹出的模态框，取消底部默认按钮 -->
     <a-modal :body-style="bodystyle" v-model:visible="visible" title="产品信息" :footer="null">
       <div style="padding: 1%">
@@ -140,17 +147,21 @@
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
-  const productList = ref([]);
+  let productList = ref([]);
   const batchPackage = ref([]);
   const priceDate = ref([]);
   const journeyPackage = ref([]);
   const schedules = ref([]);
+  let pageSize = ref(null);
+  let total = ref(null);
   // 调用接口，查询产品列表
-  onMounted(async () => {
+  const listPro = async (current) => {
     try {
-      const response = await getProductList({});
+      const response = await getProductList({ pageNo: current, pageSize: 10 });
       // response.records是所有信息，根据这个筛选
-      console.log(response.records);
+      console.log(response);
+      pageSize.value = response.size
+      total.value = response.total
       response.records.forEach((record) => {
         let product = reactive({
           proTitle: record.proTitle || null,
@@ -182,7 +193,8 @@
     } catch (error) {
       console.error('获取产品列表数据时出错：', error);
     }
-  });
+  }
+  listPro(1)
 
   /**---------------------------------------表格--------------------------------------------------**/
   // 表格静态样式
@@ -315,6 +327,16 @@
       },
     });
   };
+
+  // 当前页
+  let current = ref(1);
+  // 分页函数
+  const changePage = (currentPage) => {
+    console.log(currentPage);
+    productList.value = [];
+    listPro(currentPage)
+    currentData = productList.value;
+  }
 
   /**---------------------------------------表单--------------------------------------------------**/
   // 创建表单对象，将点击的那一行的产品数据封装到表单
