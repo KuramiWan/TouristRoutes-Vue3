@@ -5,8 +5,9 @@ const { createConfirm } = useMessage();
 
 enum Api {
   getProductList = '/core/product/productList',
-  saveOrUpdate = '/core/product/saveOrUpdate',
+  saveOrUpdate = '/core/product/temporarySaveOrUpdate',
   deleteOne = '/core/product/delete',
+  uploadImg = "/core/product/temporaryUploadImg"
 }
 
 /**
@@ -17,10 +18,10 @@ export const getProductList = (params) => defHttp.get({ url: Api.getProductList,
 
 /**
  * 保存或者更新
- * @param params
+ * @param data
  */
-export const saveOrUpdate = (params) => {
-  return defHttp.post({ url: Api.saveOrUpdate, params });
+export const saveOrUpdate = (data) => {
+  return defHttp.post({ url: Api.saveOrUpdate, data });
 };
 
 /**
@@ -30,4 +31,9 @@ export const deleteOne = (params, handleSuccess) => {
   return defHttp.delete({ url: Api.deleteOne, params }, { joinParamsToUrl: true }).then(() => {
     handleSuccess();
   });
+};
+
+
+export const uploadImg = (data) => {
+  return defHttp.post({ url: Api.uploadImg, data });
 };

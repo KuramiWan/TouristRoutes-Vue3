@@ -1,13 +1,16 @@
 <template>
   <div class="core">
-    <a-button style="margin-bottom: 1%" type="primary" @click="addProduct">新增产品</a-button>
+    <!-- 产品新增按钮 -->
+    <a-button style="margin-bottom: 1%" type="primary" @click="showModal">新增产品</a-button>
+    <!-- 整个产品表格 -->
     <div class="table-container">
-      <a-table bordered :pagination="false" :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 1500 }">
+      <a-table bordered :columns="columns" :data-source="currentData" :scroll="{ x: 1500, y: 1500 }">
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'operation'">
+          <!-- 操作单元格 -->
+          <template v-if="column.dataIndex === 'operation'">
             <a-space>
               <a @click="showModal(record)">编辑</a>
-              <a @click="deleteRow(record)">删除</a>
+              <a @click="showDeleteConfirm(record)">删除</a>
               <a-dropdown>
                 <a class="ant-dropdown-link" @click.prevent>
                   更多操作
@@ -20,9 +23,9 @@
                     </a-menu-item>
                     <a-menu-item>
                       <a-button @click="showBigModal" type="text">日程价格</a-button>
-                      <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal" cancelText="关闭" :footer="null">
+                      <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal"
+                        cancelText="关闭" :footer="null">
                         <DatePrice ref="childRef" :ProId="record.id" />
-
                         <template slot="footer">
                           <a-button @click="handleCancel">关闭</a-button>
                         </template>
@@ -39,52 +42,84 @@
               </a-dropdown>
             </a-space>
           </template>
+          <!-- 显示图片 -->
           <template v-if="column.dataIndex === 'proPageImg' || column.dataIndex === 'posters'">
-            <img style="width: 50%; height: 50%" :src="record[column.dataIndex]" />
+            <img style="width: 100%; height: 100%" :src="record[column.dataIndex]" />
           </template>
         </template>
       </a-table>
     </div>
-    <div class="pagination-container">
-      <a-pagination
-        v-model:current="currentPage"
-        v-model:page-size="pageSize"
-        :total="currentData.length"
-        show-size-changer
-        @showSizeChange="onShowSizeChange"
-      />
-    </div>
-    <a-modal :body-style="bodystyle" v-model:visible="visible" title="产品信息" :confirm-loading="confirmLoading" @ok="handleOk">
+    <!-- 编辑或者新增，弹出的模态框，取消底部默认按钮 -->
+    <a-modal :body-style="bodystyle" v-model:visible="visible" title="产品信息" :footer="null">
       <div style="padding: 1%">
-        <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
+        <!-- 模态框展示一张表单，用于收集产品数据 -->
+        <a-form :label-col="labelCol" :wrapper-col="wrapperCol">
+          <!-- 循环表格中的字段，获取需要的展示到表单 -->
           <template v-for="column in columns">
-            <template v-if="column.key !== 'operation'">
+            <!-- 不需要操作字段，推荐数和售卖数量 -->
+            <template
+              v-if="column.dataIndex !== 'operation'&&column.dataIndex !== 'recNum'&&column.dataIndex !== 'soldNumber'">
               <a-form-item :label="column.title" :key="column.key">
-                <!-- For '产品售卖数量' and '推荐指数', display as text if the key is matching -->
-                <template v-if="column.dataIndex === 'soldNumber' || column.dataIndex === 'recNum'">
-                  <span style="font-size: 14px; font-weight: 700">{{ formState[column.dataIndex] }}</span>
+                <!-- 如果是产品介绍，那么渲染为长文本框 -->
+                <template v-if="column.dataIndex === 'proIntroduction'">
+                  <!-- <textarea class="custom-textarea" v-model="formState[column.dataIndex]"></textarea> -->
+                  <a-textarea v-model:value="formState[column.dataIndex]" show-count :maxlength="150" />
                 </template>
-
-                <!-- For 'proPageImg' or 'posts', display as image upload box -->
-                <template v-else-if="column.dataIndex === 'proPageImg' || column.dataIndex === 'posters'"> </template>
-
-                <!-- For 'proIntroduction', display as textarea -->
-                <template v-else-if="column.dataIndex === 'proIntroduction'">
-                  <textarea class="custom-textarea" v-model="formState[column.dataIndex]"></textarea>
+                <!-- 如果是产品封面，那么采用图片模态框，渲染加上传 -->
+                <template v-else-if="column.dataIndex === 'proPageImg'">
+                  <div class="clearfix">
+                    <a-upload v-model:file-list="pageImg" :customRequest="customProPageImgRequest" name="file"
+                      :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
+                      <template v-if="pageImg.length==0">
+                        <plus-outlined />
+                        <div style="margin-top: 8px">Upload</div>
+                      </template>
+                      <template v-else>
+                        <div v-if="pageImg.length < 1">
+                          <plus-outlined />
+                          <div style="margin-top: 8px">Upload</div>
+                        </div>
+                      </template>
+                    </a-upload>
+                    <a-modal :visible="previewVisible" :title="previewTitle" :footer="null" @cancel="imgHandleCancel">
+                      <img alt="example" style="width: 100%" :src="previewImage" />
+                    </a-modal>
+                  </div>
                 </template>
-                <!-- For 'proEvaluate', 'proDate', and 'proMan', display as numeric input -->
+                <!-- 如果是海报，那么也采用图片模态框，渲染加上传 -->
+                <template v-else-if="column.dataIndex === 'posters'">
+                  <div class="clearfix">
+                    <a-upload v-model:file-list="posterImg" :customRequest="customPostersRequest" name="file"
+                      :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
+                      <template v-if="posterImg[0]==null">
+                        <plus-outlined />
+                        <div style="margin-top: 8px">Upload</div>
+                      </template>
+                      <template v-else>
+                        <div v-if="posterImg.length < 1">
+                          <plus-outlined />
+                          <div style="margin-top: 8px">Upload</div>
+                        </div>
+                      </template>
+                    </a-upload>
+                    <a-modal :visible="previewVisible" :title="previewTitle" :footer="null" @cancel="imgHandleCancel">
+                      <img alt="example" style="width: 100%" :src="previewImage" />
+                    </a-modal>
+                  </div>
+                </template>
+                <!-- 其余的采用普通输入框 -->
                 <template v-else>
-                  <!-- 数字判定。。。。。。。。。 -->
-                  <input
-                    v-if="column.dataIndex === 'proEvaluate' || column.dataIndex === 'proDate' || column.dataIndex === 'proMan'"
-                    v-model="formState[column.dataIndex]"
-                  />
-                  <!-- For other fields, display as regular input box -->
-                  <input v-else v-model="formState[column.dataIndex]" />
+                  <!-- <input v-model="formState[column.dataIndex]" /> -->
+                  <a-input v-model:value="formState[column.dataIndex]" />
                 </template>
               </a-form-item>
             </template>
           </template>
+          <!-- 表单的底部提交按钮 -->
+          <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
+            <a-button style="margin-left: 5%" @click="clearForm">取消</a-button>
+            <a-button style="margin-left: 40%" type="primary" @click="onSubmit">提交</a-button>
+          </a-form-item>
         </a-form>
       </div>
     </a-modal>
@@ -92,270 +127,24 @@
 </template>
 
 <script setup>
-  import { ref, reactive, computed, onMounted, defineProps } from 'vue';
-  import { DownOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
+  import { ref, computed, reactive, onMounted, defineProps } from 'vue';
+  import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import { message } from 'ant-design-vue';
-  import { getProductList, saveOrUpdate, deleteOne } from './Product.api';
+  import { getProductList, saveOrUpdate, deleteOne, uploadImg } from './Product.api';
   import { Modal } from 'ant-design-vue';
   import { createVNode, defineComponent } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
 
-  const bodystyle = {
-    height: '480px',
-    overflow: 'hidden',
-    overflowY: 'scroll',
-  };
-  const columns = [
-    {
-      title: '产品标题',
-      width: 155,
-      dataIndex: 'proTitle',
-      key: '1',
-      fixed: 'left',
-      align: 'center',
-    },
-    {
-      title: '产品估价',
-      dataIndex: 'proEvaluate',
-      key: '2',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品介绍',
-      dataIndex: 'proIntroduction',
-      key: '3',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品时长',
-      dataIndex: 'proDate',
-      key: '4',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品封面',
-      dataIndex: 'proPageImg',
-      key: '5',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品海报',
-      dataIndex: 'posters',
-      key: '6',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '成团人数',
-      dataIndex: 'proMan',
-      key: '7',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '封面标题',
-      dataIndex: 'proPageTitle',
-      key: '8',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '出发地点',
-      dataIndex: 'origin',
-      key: '9',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品售卖数量',
-      dataIndex: 'soldNumber',
-      key: '10',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '产品地点',
-      dataIndex: 'local',
-      key: '11',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '详细地点(小标题)',
-      dataIndex: 'localDetail',
-      key: '12',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '推荐指数',
-      dataIndex: 'recNum',
-      key: '13',
-      width: 155,
-      align: 'center',
-    },
-    {
-      title: '操作',
-      key: 'operation',
-      fixed: 'right',
-      width: 180,
-      align: 'center',
-    },
-  ];
-
-  const currentPage = ref(1);
-  const pageSize = ref(10);
-  const visible = ref(false);
-  const confirmLoading = ref(false);
-
-  // 点击记录
-  let clickedRecord = ref(null);
-  // 表单数据
-  let formState = reactive(null);
-
-  const labelCol = reactive({
-    style: {
-      width: '150px',
-    },
-  });
-  const wrapperCol = reactive({
-    span: 14,
-  });
-
-  const currentData = computed(() => {
-    return productList;
-  });
-
-  // 请求返回的数据
-  const productList = reactive([]);
-  const batchPackage = reactive([]);
-  const priceDate = reactive([]);
-  const journeyPackage = reactive([]);
-  const schedules = reactive([]);
-
-  // 清空表单数据
-  const resetFormState = () => {
-    if (formState) {
-      let keys = Object.keys(formState);
-      for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        formState[key] = '';
-      }
-    } else {
-      console.log('出错了，请刷新！！！');
-    }
-  };
-
-  const onShowSizeChange = (current, size) => {
-    pageSize.value = size;
-    currentPage.value = current || 1;
-  };
-
-  // 拿到本行记录
-  const showModal = (record) => {
-    // console.log(record)
-    // 有记录就是编辑
-    if (record) {
-      visible.value = true;
-      clickedRecord.value = { ...record };
-      // 更新表单数据
-      formState = { ...record };
-    } else {
-      // 没有记录就是新增
-      // 先清空或者重构
-      formState = { ...productList[0] };
-      resetFormState();
-      visible.value = true;
-    }
-  };
-
-  /** 编辑逻辑开始**/
-
-  const isFormStateValid = (formState) => {
-    for (const key in formState) {
-      if (formState.hasOwnProperty(key)) {
-        // 排除recNum和soldNumber字段的空值验证
-        if ((key === 'recNum' || key === 'soldNumber') && formState[key] === '') {
-          continue;
-        }
-
-        if (formState[key].trim() === '') {
-          return false; // 如果有任何一个属性值为空，则返回false
-        }
-      }
-    }
-    return true; // 如果所有属性值都不为空，则返回true
-  };
-
-  const error = () => {
-    message.error('不允许有空值！！！');
-  };
-  const handleOk = () => {
-    if (!isFormStateValid(formState)) {
-      // 如果有任何属性值为空，不允许上传
-      error();
-      return;
-    }
-    confirmLoading.value = true;
-    setTimeout(() => {
-      visible.value = false;
-      confirmLoading.value = false;
-      if (clickedRecord.value) {
-        const index = productList.findIndex((item) => item.key === clickedRecord.value.key);
-        if (index !== -1) {
-          productList[index] = { ...formState };
-          // 执行编辑
-          saveOrUpdate({ formState: formState });
-        }
-      } else {
-        // Add a new product to the first row
-        productList.unshift({ ...formState, key: productList.length });
-        // 执行新增
-      }
-      resetFormState();
-    }, 500);
-  };
-
-  /** 编辑逻辑结束**/
-
-  /** 删除逻辑开始**/
-  const deleteRow = (record) => {
-    const index = productList.findIndex((item) => item.id === record.id);
-    if (index !== -1) {
-      handleDelete(record);
-      productList.splice(index, 1);
-    }
-  };
-
-  /**
-   * 删除事件
-   */
-  async function handleDelete(record) {
-    await deleteOne({ id: record.id }, handleSuccess);
-  }
-  /**
-   * 成功回调
-   */
-  function handleSuccess() {
-    console.log('删除成功');
-  }
-  /** 删除逻辑结束**/
-
-  /** 添加逻辑开始**/
-  const addProduct = () => {
-    showModal();
-    // saveOrUpdate({ formState: formState })
-  };
-  /** 添加逻辑结束**/
-
-  /** 查询逻辑开始**/
+  /**---------------------------------------请求的产品数据--------------------------------------------------**/
+  // 请求返回的数据，等待请求之后完成封装
+  const productList = ref([]);
+  const batchPackage = ref([]);
+  const priceDate = ref([]);
+  const journeyPackage = ref([]);
+  const schedules = ref([]);
+  // 调用接口，查询产品列表
   onMounted(async () => {
     try {
-      // 从服务器获取产品列表综合
       const response = await getProductList({});
       // response.records是所有信息，根据这个筛选
       console.log(response.records);
@@ -377,28 +166,338 @@
           id: record.id || null,
         });
         // 产品封装
-        productList.push(product);
+        productList.value.push(product);
         // 批次套餐封装
-        batchPackage.push(record['batch_package']);
+        batchPackage.value.push(record['batch_package']);
         // 日程套餐封装
-        journeyPackage.push(record.journey);
+        journeyPackage.value.push(record.journey);
         // 每日价格封装
-        priceDate.push(record['price_date']);
+        priceDate.value.push(record['price_date']);
         // 日程封装，每日涵盖任务数组
-        schedules.push(record.schedules);
+        schedules.value.push(record.schedules);
       });
-      // 有部分数据是空，使用时需要做出合理判断
-      // console.log(productList);
-      // console.log(batchPackage);
-      // console.log(journeyPackage);
-      // console.log(priceDate);
-      // console.log(schedules);
     } catch (error) {
       console.error('获取产品列表数据时出错：', error);
     }
   });
-  /** 查询逻辑结束**/
 
+  /**---------------------------------------表格--------------------------------------------------**/
+  // 表格静态样式
+  const bodystyle = {
+    height: '480px',
+    overflow: 'hidden',
+    overflowY: 'scroll',
+  };
+  // html中静态的表格字段
+  const columns = [
+    {
+      title: '产品标题',
+      width: 155,
+      dataIndex: 'proTitle',
+      key: '1',
+      fixed: 'left',
+    },
+    {
+      title: '产品估价',
+      dataIndex: 'proEvaluate',
+      key: '2',
+      width: 155,
+    },
+    {
+      title: '产品介绍',
+      dataIndex: 'proIntroduction',
+      key: '3',
+      width: 155,
+    },
+    {
+      title: '产品时长',
+      dataIndex: 'proDate',
+      key: '4',
+      width: 155,
+    },
+    {
+      title: '产品封面',
+      dataIndex: 'proPageImg',
+      key: '5',
+      width: 155,
+    },
+    {
+      title: '产品海报',
+      dataIndex: 'posters',
+      key: '6',
+      width: 155,
+    },
+    {
+      title: '成团人数',
+      dataIndex: 'proMan',
+      key: '7',
+      width: 155,
+    },
+    {
+      title: '封面标题',
+      dataIndex: 'proPageTitle',
+      key: '8',
+      width: 155,
+    },
+    {
+      title: '出发地点',
+      dataIndex: 'origin',
+      key: '9',
+      width: 155,
+    },
+    {
+      title: '产品售卖数量',
+      dataIndex: 'soldNumber',
+      key: '10',
+      width: 155,
+    },
+    {
+      title: '产品地点',
+      dataIndex: 'local',
+      key: '11',
+      width: 155,
+    },
+    {
+      title: '详细地点(小标题)',
+      dataIndex: 'localDetail',
+      key: '12',
+      width: 155,
+    },
+    {
+      title: '推荐指数',
+      dataIndex: 'recNum',
+      key: '13',
+      width: 155,
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
+      key: '14',
+      fixed: 'right',
+      width: 180,
+    },
+  ];
+  // 表格中的产品数据
+  let currentData = productList.value
+  // 调用接口删除数据库中数据
+  async function handleDelete(record) {
+    await deleteOne({ id: record.id }, handleSuccess);
+  }
+  // 删除成功之后的回调
+  function handleSuccess() {
+    console.log('删除成功');
+  }
+  // 前端操作按钮之删除
+  const deleteRecord = (record) => {
+    const index = currentData.findIndex(item => item.id === record.id);
+    if (index !== -1) {
+      handleDelete(record);
+      currentData.splice(index, 1);
+    }
+  }
+  // 点击删除之后，弹出警告对话框
+  const showDeleteConfirm = (record) => {
+    Modal.confirm({
+      title: '是否删除？',
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '删除之后，将无法找到',
+      okText: '是',
+      okType: 'danger',
+      cancelText: '否',
+      onOk() {
+        deleteRecord(record)
+      },
+      onCancel() {
+        console.log('取消成功');
+      },
+    });
+  };
+
+  /**---------------------------------------表单--------------------------------------------------**/
+  // 创建表单对象，将点击的那一行的产品数据封装到表单
+  let formState = ref(null);
+  // 展示模态窗口之后，将行记录保存下来
+  // let outerRecord = ref(null);
+  // 表单的静态属性
+  const labelCol = ref({
+    style: {
+      width: '150px',
+    },
+  });
+  const wrapperCol = ref({
+    span: 14,
+  });
+  // 清空表单数据
+  // 清空表单数据
+  const resetFormState = () => {
+    if (formState.value) {
+      let keys = Object.keys(formState.value);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        formState.value[key] = '';
+      }
+    } else {
+      console.log('出错了，请刷新！！！');
+    }
+  };
+  // 判断数据是否为空
+  const isObjectEmpty = (obj) => {
+    // 遍历对象的属性
+    for (const key of Object.keys(obj)) {
+      if (key !== 'id' && key !== 'recNum' && key !== 'soldNumber' && key !== 'proPageImg' && key !== 'posters' && !obj[key]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  // 空值报错
+  const errorNull = (msg) => {
+    message.error(msg);
+  };
+
+  // 提交表单
+  const onSubmit = async () => {
+    // console.log(pageImg.value.length === 0)
+    // debugger;
+    // 关闭模态框
+    visible.value = false;
+    // 收集表单数据
+    let submitForm = { ...formState.value };
+    // console.log("111111111111111111111111111", submitForm);
+    // debugger;
+    // 需要任意数据不为空
+    if (!isObjectEmpty(submitForm)) {
+      errorNull('添加失败，不允许有空值！！！');
+      return;
+    }
+    try {
+      submitForm.proPageImg = pageImg.value[0].url;
+      submitForm.posters = posterImg.value[0].url;
+    } catch (error) {
+      errorNull('添加失败，图片必选！！！');
+      console.error('发生错误：', error.message);
+      return null;
+    }
+    // console.log("11111111111111111111", submitForm)
+    // debugger
+    // 如果是新增，需要添加到表格首行
+    if (!submitForm.id) {
+      currentData.unshift(submitForm);
+      const response = await saveOrUpdate(submitForm);
+      submitForm.id = response[0];
+    } else {
+      // 如果是编辑，直接提交
+      const index = currentData.findIndex(item => item.id === submitForm.id);
+      if (index !== -1) {
+        Object.keys(submitForm).forEach(key => {
+          currentData[index][key] = submitForm[key];
+        });
+      }
+      const response = await saveOrUpdate(submitForm);
+    }
+  };
+  // 关闭表单
+  const clearForm = () => {
+    // 关闭模态框
+    visible.value = false;
+    // 清空表单
+    resetFormState();
+
+  }
+
+  /**---------------------------------------模态框-表单--------------------------------------------------**/
+  let visible = ref(false);
+  // 表单中的图片列表
+  let pageImg = ref([]);
+  let posterImg = ref([]);
+  // 展示模态框中的表单
+  const showModal = (record) => {
+    // 有记录就是编辑
+    if (record.id) {
+      visible.value = true;
+      // 更新表单数据
+      formState.value = { ...record };
+      // outerRecord = record;
+      pageImg.value = []
+      posterImg.value = []
+      pageImg.value.push({
+        uid: '',
+        name: '',
+        url: formState.value.proPageImg
+      })
+      posterImg.value.push({
+        uid: '',
+        name: '',
+        url: formState.value.posters
+      })
+      return
+    }
+    // 没有记录就是新增
+    // 先清空或者重构
+    formState.value = { ...currentData[0] };
+    resetFormState();
+    pageImg.value = []
+    posterImg.value = []
+    visible.value = true;
+  };
+
+  /**---------------------------------------模态框-表单中的图片上传--------------------------------------------------**/
+  const previewVisible = ref(false);
+  const previewImage = ref('');
+  const previewTitle = ref('');
+  const imgHandleCancel = () => {
+    previewVisible.value = false;
+    previewTitle.value = '';
+  };
+  const handlePreview = async file => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    previewImage.value = file.url || file.preview;
+    previewVisible.value = true;
+    previewTitle.value = file.name || file.url.substring(file.url.lastIndexOf('/') + 1);
+  };
+  // 转base64
+  function getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+  // 自定义图片上传：返回值：url
+  const customProPageImgRequest = async (e) => {
+    console.log('e', e);
+    let base64Img = await getBase64(e.file);
+    let imgbase64 = base64Img.split(',')[1];
+    let data = {
+      base64Data: imgbase64,
+      witch: 1,
+    }
+    uploadImg(data).then((res) => {
+      e.onProgress({ percent: 100 });
+      e.file.url = res[0];
+      e.onSuccess(res[0], e);
+    })
+  };
+  const customPostersRequest = async (e) => {
+    console.log('e', e);
+    console.log('e', e);
+    let base64Img = await getBase64(e.file);
+    let imgbase64 = base64Img.split(',')[1];
+    let data = {
+      base64Data: imgbase64,
+      witch: 0,
+    }
+    uploadImg(data).then((res) => {
+      e.onProgress({ percent: 100 });
+      e.file.url = res[0];
+      e.onSuccess(res[0], e);
+    })
+  };
+
+  /**---------------------------------------调用日程价格组件--------------------------------------------------**/
   const open = ref(false);
   const childRef = ref();
   const getChild = () => {
@@ -433,40 +532,6 @@
   .pagination-container {
     position: relative;
     margin-top: 1rem;
-  }
-
-  input {
-    outline-style: none;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 5px 5px;
-    width: 300px;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  input:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-  }
-
-  .custom-textarea {
-    outline-style: none;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 5px 5px;
-    width: 300px;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .custom-textarea:focus {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   }
 
   .full-modal {
