@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button type="primary" @click="showModal">点击查看日程</a-button>
+    <!-- <a-button type="primary" @click="showModal">点击查看日程</a-button> -->
     <a-modal v-model:visible="visible" title="产品日程" width="100%" wrap-class-name="full-modal" @ok="handleOk" ok-text="确定">
       <div class="schedule-content">
         <template v-if="schedules.length !== 0">
@@ -152,7 +152,8 @@
       EditSchedule,
       PlusOutlined,
     },
-    setup() {
+    props: ['proId'],
+    setup(props, ctx) {
       const openIndex = ref<any>([]);
       const visible = ref<boolean>(false);
       const editScheduleVisible = ref<boolean>(false);
@@ -160,13 +161,14 @@
       const schedules = ref<any>([]);
       const mySchedule = ref<any>();
       const tasks = ref<any>([]);
+      const proId = ref<any>(props.proId);
 
       const showModal = () => {
         openIndex.value = [];
         let params = {
-          id: '66',
+          id: proId.value,
         };
-
+        console.log('proId', params);
         getProductList(params).then((res) => {
           console.log('res===', res);
           for (let i = 0; i < res.schedules.length; i++) {
