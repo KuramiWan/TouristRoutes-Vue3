@@ -196,8 +196,13 @@
         console.log(e);
       };
 
+      const tempSchedule = ref<any>();
+
       // 展示编辑日程的模态框
       const showEditSchedule = (schedule) => {
+        tempSchedule.value = schedule.value;
+        schedule.value = [];
+        schedule.value = tempSchedule.value;
         editScheduleVisible.value = true;
         mySchedule.value = schedule;
         console.log('editScheduleVisible.value', editScheduleVisible.value);
@@ -229,6 +234,7 @@
       return {
         visible,
         showModal,
+        tempSchedule,
         handleOk,
         cancelScheduleDelete,
         confirmScheduleDelete,

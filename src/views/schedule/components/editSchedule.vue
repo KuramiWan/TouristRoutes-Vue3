@@ -149,6 +149,7 @@
       const visible = ref<boolean>(props.editScheduleVisible);
       console.log('visible', visible);
       const onClose = () => {
+        // tasksImgsList.value = [];
         visible.value = false;
         ctx.emit('changeVisible', visible.value);
       };
@@ -163,9 +164,11 @@
         // if(tasksImgsList.value !== null && )
         for (let i = 0; i < form.value.tasks.length; i++) {
           let tempArr = [];
-          tasksImgsList.value[i].forEach((img) => {
-            tempArr.push(img.url);
-          });
+          if (tasksImgsList.value[i] !== undefined) {
+            tasksImgsList.value[i].forEach((img) => {
+              tempArr.push(img.url);
+            });
+          }
           // console.log('iiiiii', i);
           form.value.tasks[i].taskImgs = tempArr;
         }
@@ -233,6 +236,7 @@
 
       const addTask = () => {
         form.value.tasks.push({
+          id: '',
           proId: form.value.proId,
           schId: form.value.id,
           taskContent: null,
@@ -284,6 +288,7 @@
       schedule(newValue) {
         console.log('newValue', newValue);
         this.form = newValue;
+        this.tasksImgsList = [];
         let tasks = newValue.tasks;
         const that = this;
         if (tasks != null && tasks.length !== 0) {
