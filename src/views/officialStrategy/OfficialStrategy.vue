@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { getFriendStrategyList } from '/@/views/friendStrategy/friendStrategyApi';
+import { getFriendStrategyList } from '/src/views/friendStrategy/friendStrategyApi';
 
 const columns = [
   {

@@ -1,4 +1,4 @@
-import { defHttp } from '/@/utils/http/axios';
+import { defHttp } from '/src/utils/http/axios';
 
 enum Api {
   Strategy = 'strategy/friendStrategy/queryById',
