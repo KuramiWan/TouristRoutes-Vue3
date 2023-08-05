@@ -1,7 +1,8 @@
 <template>
+  <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">Add</a-button>
   <a-table :columns="columns" :data-source="dataSource" bordered>
     <template #bodyCell="{ column, text, record }">
-      <template v-if="['name', 'age', 'address'].includes(column.dataIndex)">
+      <template v-if="['title', 'content', 'forwardCount', 'img', 'likeCount', 'userid'].includes(column.dataIndex)">
         <div>
           <a-input v-if="editableData[record.key]" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
           <template v-else>
@@ -21,26 +22,31 @@
             <a @click="edit(record.key)">编辑</a>
           </span>
         </div>
+        <a-popconfirm v-if="dataSource.length" title="Sure to delete?" @confirm="onDelete(record.key)">
+          <a>Delete</a>
+        </a-popconfirm>
       </template>
     </template>
   </a-table>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
   import { cloneDeep } from 'lodash-es';
-  import { defineComponent, reactive, ref } from 'vue';
+  import { reactive, ref } from 'vue';
   import type { UnwrapRef } from 'vue';
+  import { getFriendStrategyList, updateFriendStrategy, deleteFriendStrategy, addFriendStrategy } from './friendStrategyApi';
 
   const columns = [
     {
       title: '攻略标题',
       width: 180,
       dataIndex: 'title',
-      fixed: 'left',
+      ellipsis: true,
     },
     {
       title: '攻略内容',
       width: 180,
       dataIndex: 'content',
+      ellipsis: true,
     },
     {
       title: '转发数',
@@ -51,6 +57,7 @@
       title: '攻略图片',
       dataIndex: 'img',
       width: 150,
+      ellipsis: true,
     },
     {
       title: '点赞数',
@@ -61,10 +68,10 @@
       title: '攻略用户id',
       dataIndex: 'userid',
       width: 150,
+      ellipsis: true,
     },
     {
       title: '操作',
-      fixed: 'right',
       dataIndex: 'operation',
       width: 180,
     },
@@ -79,43 +86,72 @@
     likeCount: string;
   }
   const data: DataItem[] = [];
-  for (let i = 0; i < 100; i++) {
-    data.push({
-      key: i.toString(),
-      title: 'string',
-      content: 'string',
-      forwardCount: 'string',
-      userid: 'string',
-      img: 'string',
-      likeCount: 'string',
+  // for (let i = 0; i < 100; i++) {
+  //   data.push({
+  //     key: i.toString(),
+  //     title: 'string',
+  //     content: 'string',
+  //     forwardCount: 'string',
+  //     userid: 'string',
+  //     img: 'string',
+  //     likeCount: 'string',
+  //   });
+  // }
+  let counter = 0;
+  function getList() {
+    const page = {
+      pageNo: 1,
+      pageSize: 10,
+    };
+    getFriendStrategyList(page).then((res) => {
+      dataSource.value = res.records;
+      dataSource.value.forEach((item) => {
+        item.key = (counter++).toString();
+      });
     });
   }
-  export default defineComponent({
-    setup() {
-      const dataSource = ref(data);
-      const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 
-      const edit = (key: string) => {
-        editableData[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
-      };
-      const save = (key: string) => {
-        Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
-        delete editableData[key];
-      };
-      const cancel = (key: string) => {
-        delete editableData[key];
-      };
-      return {
-        dataSource,
-        columns,
-        editingKey: '',
-        editableData,
-        edit,
-        save,
-        cancel,
-      };
-    },
-  });
+  const dataSource = ref(data);
+  const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
+
+  const edit = (key: string) => {
+    editableData[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
+    console.log(editableData[key]);
+  };
+  const save = (key: string) => {
+    Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
+    updateFriendStrategy(editableData[key]).then((res) => {
+      console.log(res);
+    });
+    delete editableData[key];
+  };
+  const cancel = (key: string) => {
+    delete editableData[key];
+  };
+
+  const onDelete = (key: string) => {
+    dataSource.value = dataSource.value.filter((item) => item.key !== key);
+    deleteFriendStrategy(dataSource[key].id);
+  };
+
+  const handleAdd = () => {
+    const newData = {
+      key: `${++counter}`,
+      title: '',
+      content: '',
+      forwardCount: '',
+      userid: '',
+      img: '',
+      likeCount: '',
+    };
+    dataSource.value.push(newData);
+    // editableData[counter] = newData;
+    addFriendStrategy(dataSource[counter]).then((res) => {
+      console.log(res);
+    });
+  };
+
+  getList();
 
   // const columns = [
   //   {

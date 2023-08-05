@@ -1,24 +1,29 @@
 import { defHttp } from '/@/utils/http/axios';
 
 enum Api {
-  DatePrice = 'strategy/friendStrategy/queryById',
-  DeletePrice = 'strategy/friendStrategy/delete',
-  AddDatePrice = 'strategy/friendStrategy/add',
-  updatePriceAndDate = 'strategy/friendStrategy/edit',
+  Strategy = 'strategy/friendStrategy/queryById',
+  DeleteStrategy = 'strategy/friendStrategy/delete',
+  AddStrategy = 'strategy/friendStrategy/add',
+  updateStrategy = 'strategy/friendStrategy/edit',
+  List = 'strategy/friendStrategy/list',
 }
 
-export function getDatePrice(params: { proId: string }) {
-  return defHttp.get({ url: Api.DatePrice, params });
+export function getFriendStrategy(params: { proId: string }) {
+  return defHttp.get({ url: Api.Strategy, params });
 }
 
-export function deleteDatePrice(params: { id: string }) {
-  return defHttp.delete({ url: Api.DeletePrice, params });
+export function deleteFriendStrategy(params: { id: string }) {
+  return defHttp.delete({ url: Api.DeleteStrategy, params });
 }
 
-export function addDatePrice(params) {
-  return defHttp.post({ url: Api.AddDatePrice, params });
+export function getFriendStrategyList(params) {
+  return defHttp.get({ url: Api.List, params });
 }
 
-export function updateDatePrice(params) {
-  return defHttp.post({ url: Api.updatePriceAndDate, params });
+export function addFriendStrategy(params) {
+  return defHttp.post({ url: Api.AddStrategy, params });
+}
+
+export function updateFriendStrategy(params) {
+  return defHttp.post({ url: Api.updateStrategy, params });
 }
