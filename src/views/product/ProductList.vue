@@ -20,7 +20,8 @@
                 <template #overlay>
                   <a-menu>
                     <a-menu-item>
-                      <a>日程详情</a>
+                      <a-button @click="showScheduleModal" type="text">日程详情</a-button>
+                      <ScheduleList :proId="record.id" ref="ScheduleModal" />
                     </a-menu-item>
                     <a-menu-item>
                       <a-button @click="showBigModal" type="text">日程价格</a-button>
@@ -59,7 +60,7 @@
           <template v-for="column in columns">
             <!-- 不需要操作字段，推荐数和售卖数量 -->
             <template
-              v-if="column.dataIndex !== 'operation'&&column.dataIndex !== 'recNum'&&column.dataIndex !== 'soldNumber'">
+              v-if="column.dataIndex !== 'operation' && column.dataIndex !== 'recNum' && column.dataIndex !== 'soldNumber'">
               <a-form-item :label="column.title" :key="column.key">
                 <!-- 如果是产品介绍，那么渲染为长文本框 -->
                 <template v-if="column.dataIndex === 'proIntroduction'">
@@ -71,7 +72,7 @@
                   <div class="clearfix">
                     <a-upload v-model:file-list="pageImg" :customRequest="customProPageImgRequest" name="file"
                       :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
-                      <template v-if="pageImg.length==0">
+                      <template v-if="pageImg.length == 0">
                         <plus-outlined />
                         <div style="margin-top: 8px">Upload</div>
                       </template>
@@ -92,7 +93,7 @@
                   <div class="clearfix">
                     <a-upload v-model:file-list="posterImg" :customRequest="customPostersRequest" name="file"
                       :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
-                      <template v-if="posterImg[0]==null">
+                      <template v-if="posterImg[0] == null">
                         <plus-outlined />
                         <div style="margin-top: 8px">Upload</div>
                       </template>
@@ -135,6 +136,7 @@
   import { Modal } from 'ant-design-vue';
   import { createVNode, defineComponent } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
+  import ScheduleList from '../schedule/scheduleList.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -279,7 +281,7 @@
     },
   ];
   // 表格中的产品数据
-  let currentData = productList.value
+  let currentData = productList.value;
   // 调用接口删除数据库中数据
   async function handleDelete(record) {
     await deleteOne({ id: record.id }, handleSuccess);
@@ -290,12 +292,12 @@
   }
   // 前端操作按钮之删除
   const deleteRecord = (record) => {
-    const index = currentData.findIndex(item => item.id === record.id);
+    const index = currentData.findIndex((item) => item.id === record.id);
     if (index !== -1) {
       handleDelete(record);
       currentData.splice(index, 1);
     }
-  }
+  };
   // 点击删除之后，弹出警告对话框
   const showDeleteConfirm = (record) => {
     Modal.confirm({
@@ -306,7 +308,7 @@
       okType: 'danger',
       cancelText: '否',
       onOk() {
-        deleteRecord(record)
+        deleteRecord(record);
       },
       onCancel() {
         console.log('取消成功');
@@ -386,9 +388,9 @@
       submitForm.id = response[0];
     } else {
       // 如果是编辑，直接提交
-      const index = currentData.findIndex(item => item.id === submitForm.id);
+      const index = currentData.findIndex((item) => item.id === submitForm.id);
       if (index !== -1) {
-        Object.keys(submitForm).forEach(key => {
+        Object.keys(submitForm).forEach((key) => {
           currentData[index][key] = submitForm[key];
         });
       }
@@ -401,8 +403,7 @@
     visible.value = false;
     // 清空表单
     resetFormState();
-
-  }
+  };
 
   /**---------------------------------------模态框-表单--------------------------------------------------**/
   let visible = ref(false);
@@ -416,26 +417,27 @@
       visible.value = true;
       // 更新表单数据
       formState.value = { ...record };
-      pageImg.value = []
-      posterImg.value = []
+      // outerRecord = record;
+      pageImg.value = [];
+      posterImg.value = [];
       pageImg.value.push({
         uid: '',
         name: '',
-        url: formState.value.proPageImg
-      })
+        url: formState.value.proPageImg,
+      });
       posterImg.value.push({
         uid: '',
         name: '',
-        url: formState.value.posters
-      })
-      return
+        url: formState.value.posters,
+      });
+      return;
     }
     // 没有记录就是新增
     // 先清空或者重构
     formState.value = { ...currentData[0] };
     resetFormState();
-    pageImg.value = []
-    posterImg.value = []
+    pageImg.value = [];
+    posterImg.value = [];
     visible.value = true;
   };
 
@@ -447,7 +449,7 @@
     previewVisible.value = false;
     previewTitle.value = '';
   };
-  const handlePreview = async file => {
+  const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
@@ -461,7 +463,7 @@
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   }
   // 自定义图片上传：返回值：url
@@ -472,12 +474,12 @@
     let data = {
       base64Data: imgbase64,
       witch: 1,
-    }
+    };
     uploadImg(data).then((res) => {
       e.onProgress({ percent: 100 });
       e.file.url = res[0];
       e.onSuccess(res[0], e);
-    })
+    });
   };
   const customPostersRequest = async (e) => {
     console.log('e', e);
@@ -487,12 +489,12 @@
     let data = {
       base64Data: imgbase64,
       witch: 0,
-    }
+    };
     uploadImg(data).then((res) => {
       e.onProgress({ percent: 100 });
       e.file.url = res[0];
       e.onSuccess(res[0], e);
-    })
+    });
   };
 
   /**---------------------------------------调用日程价格组件--------------------------------------------------**/
@@ -507,6 +509,12 @@
   };
   const handleCancel = () => {
     open.value = false;
+  };
+
+  /**---------------------------------------调用日程详情组件--------------------------------------------------**/
+  const ScheduleModal = ref();
+  const showScheduleModal = () => {
+    ScheduleModal.value.showModal();
   };
 </script>
 
