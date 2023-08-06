@@ -4,7 +4,8 @@
     <a-button style="margin-bottom: 1%" type="primary" @click="showModal">新增产品</a-button>
     <!-- 整个产品表格 -->
     <div class="table-container">
-      <a-table bordered :columns="columns" :pagination="false" :data-source="currentData" :scroll="{ x: 1500 }">
+      <a-table bordered :columns="columns" :pagination="false" :data-source="currentData"
+        :scroll="{ x: 1500, y: 1500 }">
         <template #bodyCell="{ column, record }">
           <!-- 操作单元格 -->
           <template v-if="column.dataIndex === 'operation'">
@@ -32,7 +33,21 @@
                       </a-modal>
                     </a-menu-item>
                     <a-menu-item>
-                      <a>批次套餐</a>
+                      <a-button @click="goBatch" type="text">批次套餐</a-button>
+                      <a-modal
+                        @ok="closeBatch"
+                        v-model:visible="openBatch"
+                        title="批次套餐"
+                        width="100%"
+                        wrapClassName="full-modal"
+                        cancelText="关闭"
+                        :footer="null"
+                      >
+                        <BatchPackage :pro-id="record.id" />
+                        <template #footer>
+                          <a-button @click="openBatch = false">关闭</a-button>
+                        </template>
+                      </a-modal>
                     </a-menu-item>
                     <a-menu-item>
                       <a>行程套餐</a>
@@ -151,9 +166,10 @@
   import { message } from 'ant-design-vue';
   import { getProductList, saveOrUpdate, deleteOne, uploadImg } from './Product.api';
   import { Modal } from 'ant-design-vue';
-  import { createVNode, defineComponent } from 'vue';
+  import { createVNode } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
   import ScheduleList from '../schedule/scheduleList.vue';
+  import BatchPackage from '../package/batch.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -544,7 +560,15 @@
       e.onSuccess(res[0], e);
     });
   };
+  const openBatch = ref(false);
+  const goBatch = () => {
+    openBatch.value = true;
+  };
 
+  const closeBatch = (e) => {
+    console.log(e);
+    openBatch.value = false;
+  };
   /**---------------------------------------调用日程价格组件--------------------------------------------------**/
   const open = ref(false);
   const childRef = ref();
