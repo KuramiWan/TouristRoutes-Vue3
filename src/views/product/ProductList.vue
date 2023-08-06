@@ -4,8 +4,7 @@
     <a-button style="margin-bottom: 1%" type="primary" @click="showModal">新增产品</a-button>
     <!-- 整个产品表格 -->
     <div class="table-container">
-      <a-table bordered :columns="columns" :pagination="false" :data-source="currentData"
-        :scroll="{ x: 1500, y: 1500 }">
+      <a-table bordered :columns="columns" :pagination="false" :data-source="currentData" :scroll="{ x: 1500 }">
         <template #bodyCell="{ column, record }">
           <!-- 操作单元格 -->
           <template v-if="column.dataIndex === 'operation'">
@@ -25,8 +24,7 @@
                     </a-menu-item>
                     <a-menu-item>
                       <a-button @click="showBigModal" type="text">日程价格</a-button>
-                      <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal"
-                        cancelText="关闭" :footer="null">
+                      <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal" cancelText="关闭" :footer="null">
                         <DatePrice ref="childRef" :ProId="record.id" />
                         <template slot="footer">
                           <a-button @click="handleCancel">关闭</a-button>
@@ -46,7 +44,7 @@
           </template>
           <!-- 显示图片 -->
           <template v-if="column.dataIndex === 'proPageImg' || column.dataIndex === 'posters'">
-            <img style="width: 100%; height: 100%" :src="record[column.dataIndex]" />
+            <img style="width: 100%; height: 110px" :src="record[column.dataIndex]" />
           </template>
         </template>
       </a-table>
@@ -54,8 +52,7 @@
 
     <!-- 分页组件 -->
     <div class="paginationCom">
-      <a-pagination size="small" @change="changePage(current)" v-model:pageSize="pageSize" v-model:current="current"
-        :total="total" />
+      <a-pagination size="small" @change="changePage(current)" v-model:pageSize="pageSize" v-model:current="current" :total="total" />
     </div>
 
     <!-- 编辑或者新增，弹出的模态框，取消底部默认按钮 -->
@@ -66,8 +63,7 @@
           <!-- 循环表格中的字段，获取需要的展示到表单 -->
           <template v-for="column in columns">
             <!-- 不需要操作字段，推荐数和售卖数量 -->
-            <template
-              v-if="column.dataIndex !== 'operation' && column.dataIndex !== 'recNum' && column.dataIndex !== 'soldNumber'">
+            <template v-if="column.dataIndex !== 'operation' && column.dataIndex !== 'recNum' && column.dataIndex !== 'soldNumber'">
               <a-form-item :label="column.title" :key="column.key">
                 <!-- 如果是产品介绍，那么渲染为长文本框 -->
                 <template v-if="column.dataIndex === 'proIntroduction'">
@@ -77,8 +73,15 @@
                 <!-- 如果是产品封面，那么采用图片模态框，渲染加上传 -->
                 <template v-else-if="column.dataIndex === 'proPageImg'">
                   <div class="clearfix">
-                    <a-upload v-model:file-list="pageImg" :customRequest="customProPageImgRequest" name="file"
-                      :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
+                    <a-upload
+                      v-model:file-list="pageImg"
+                      :customRequest="customProPageImgRequest"
+                      name="file"
+                      :multiple="true"
+                      list-type="picture-card"
+                      @preview="handlePreview"
+                      @change="uploadChange"
+                    >
                       <template v-if="pageImg.length == 0">
                         <plus-outlined />
                         <div style="margin-top: 8px">Upload</div>
@@ -98,8 +101,15 @@
                 <!-- 如果是海报，那么也采用图片模态框，渲染加上传 -->
                 <template v-else-if="column.dataIndex === 'posters'">
                   <div class="clearfix">
-                    <a-upload v-model:file-list="posterImg" :customRequest="customPostersRequest" name="file"
-                      :multiple="true" list-type="picture-card" @preview="handlePreview" @change="uploadChange">
+                    <a-upload
+                      v-model:file-list="posterImg"
+                      :customRequest="customPostersRequest"
+                      name="file"
+                      :multiple="true"
+                      list-type="picture-card"
+                      @preview="handlePreview"
+                      @change="uploadChange"
+                    >
                       <template v-if="posterImg[0] == null">
                         <plus-outlined />
                         <div style="margin-top: 8px">Upload</div>
@@ -160,8 +170,8 @@
       const response = await getProductList({ pageNo: current, pageSize: 10 });
       // response.records是所有信息，根据这个筛选
       console.log(response);
-      pageSize.value = response.size
-      total.value = response.total
+      pageSize.value = response.size;
+      total.value = response.total;
       response.records.forEach((record) => {
         let product = reactive({
           proTitle: record.proTitle || null,
@@ -193,8 +203,8 @@
     } catch (error) {
       console.error('获取产品列表数据时出错：', error);
     }
-  }
-  listPro(1)
+  };
+  listPro(1);
 
   /**---------------------------------------表格--------------------------------------------------**/
   // 表格静态样式
@@ -211,78 +221,94 @@
       dataIndex: 'proTitle',
       key: '1',
       fixed: 'left',
+      ellipsis: true,
+      align: 'center',
     },
     {
       title: '产品估价',
       dataIndex: 'proEvaluate',
       key: '2',
       width: 155,
+      align: 'center',
     },
     {
       title: '产品介绍',
       dataIndex: 'proIntroduction',
       key: '3',
       width: 155,
+      ellipsis: true,
+      align: 'center',
     },
     {
       title: '产品时长',
       dataIndex: 'proDate',
       key: '4',
       width: 155,
+      align: 'center',
     },
     {
       title: '产品封面',
       dataIndex: 'proPageImg',
       key: '5',
       width: 155,
+      align: 'center',
     },
     {
       title: '产品海报',
       dataIndex: 'posters',
       key: '6',
       width: 155,
+      align: 'center',
     },
     {
       title: '成团人数',
       dataIndex: 'proMan',
       key: '7',
       width: 155,
+      align: 'center',
     },
     {
       title: '封面标题',
       dataIndex: 'proPageTitle',
       key: '8',
       width: 155,
+      ellipsis: true,
+      align: 'center',
     },
     {
       title: '出发地点',
       dataIndex: 'origin',
       key: '9',
       width: 155,
+      align: 'center',
     },
     {
       title: '产品售卖数量',
       dataIndex: 'soldNumber',
       key: '10',
       width: 155,
+      align: 'center',
     },
     {
       title: '产品地点',
       dataIndex: 'local',
       key: '11',
       width: 155,
+      align: 'center',
     },
     {
       title: '详细地点(小标题)',
       dataIndex: 'localDetail',
       key: '12',
       width: 155,
+      align: 'center',
     },
     {
       title: '推荐指数',
       dataIndex: 'recNum',
       key: '13',
       width: 155,
+      align: 'center',
     },
     {
       title: '操作',
@@ -334,9 +360,9 @@
   const changePage = (currentPage) => {
     console.log(currentPage);
     productList.value = [];
-    listPro(currentPage)
+    listPro(currentPage);
     currentData = productList.value;
-  }
+  };
 
   /**---------------------------------------表单--------------------------------------------------**/
   // 创建表单对象，将点击的那一行的产品数据封装到表单

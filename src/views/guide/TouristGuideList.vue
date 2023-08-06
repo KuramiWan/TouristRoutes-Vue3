@@ -1,173 +1,182 @@
 <template>
   <div>
-    <!--引用表格-->
-   <BasicTable @register="registerTable" :rowSelection="rowSelection">
-     <!--插槽:table标题-->
-      <template #tableTitle>
-          <a-button type="primary" @click="handleAdd" preIcon="ant-design:plus-outlined"> 新增</a-button>
-          <a-button  type="primary" preIcon="ant-design:export-outlined" @click="onExportXls"> 导出</a-button>
-          <j-upload-button  type="primary" preIcon="ant-design:import-outlined" @click="onImportXls">导入</j-upload-button>
-          <a-dropdown v-if="selectedRowKeys.length > 0">
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item key="1" @click="batchHandleDelete">
-                    <Icon icon="ant-design:delete-outlined"></Icon>
-                    删除
-                  </a-menu-item>
-                </a-menu>
-              </template>
-              <a-button>批量操作
-                <Icon icon="mdi:chevron-down"></Icon>
-              </a-button>
-        </a-dropdown>
-      </template>
-       <!--操作栏-->
-      <template #action="{ record }">
-        <TableAction :actions="getTableAction(record)" :dropDownActions="getDropDownAction(record)"/>
-      </template>
-      <!--字段回显插槽-->
-      <template #htmlSlot="{text}">
-         <div v-html="text"></div>
-      </template>
-      <!--省市区字段回显插槽-->
-      <template #pcaSlot="{text}">
-         {{ getAreaTextByCode(text) }}
-      </template>
-      <template #fileSlot="{text}">
-         <span v-if="!text" style="font-size: 12px;font-style: italic;">无文件</span>
-         <a-button v-else :ghost="true" type="primary" preIcon="ant-design:download-outlined" size="small" @click="downloadFile(text)">下载</a-button>
-      </template>
-    </BasicTable>
-    <!-- 表单区域 -->
-    <TouristGuideModal @register="registerModal" @success="handleSuccess"></TouristGuideModal>
+    <a-card>
+      <a-button type="primary" style="margin-bottom: 10px">添加导游</a-button>
+      <a-table bordered sticky :columns="columns" :data-source="data" :scroll="{ x: 1500 }">
+        <template #bodyCell="{ column, record }">
+          <!-- 操作单元格 -->
+          <template v-if="column.key === 'operation'">
+            <a-space>
+              <a @click="showModal(record)">编辑</a>
+              <a @click="showDeleteConfirm(record)">删除</a>
+              <a-dropdown>
+                <a class="ant-dropdown-link" @click.prevent> 更多操作 <DownOutlined /> </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item>
+                      <a>带队产品</a>
+                    </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </a-space>
+          </template>
+          <!-- 显示图片 -->
+          <template v-else-if="column.dataIndex === 'avatar'">
+            <img style="width: 100%; height: 100%" :src="record[column.dataIndex]" />
+          </template>
+          <template v-else-if="column.key === 'greatSpots'">
+            <span>
+              <a-tag v-for="tag in record.greatSpots" :key="tag" color="green">
+                {{ tag }}
+              </a-tag>
+            </span>
+          </template>
+        </template>
+      </a-table>
+    </a-card>
   </div>
 </template>
+<script lang="ts">
+  import type { TableColumnsType } from 'ant-design-vue';
+  import { DownOutlined } from '@ant-design/icons-vue';
+  import { defineComponent, ref } from 'vue';
+  import type { Ref } from 'vue';
+  import { getGuideList } from './api/index';
 
-<script lang="ts" name="guide-touristGuide" setup>
-  import {ref, computed, unref} from 'vue';
-  import {BasicTable, useTable, TableAction} from '/@/components/Table';
-  import {useModal} from '/@/components/Modal';
-  import { useListPage } from '/@/hooks/system/useListPage'
-  import TouristGuideModal from './components/TouristGuideModal.vue'
-  import {columns, searchFormSchema} from './TouristGuide.data';
-  import {list, deleteOne, batchDelete, getImportUrl,getExportUrl} from './TouristGuide.api';
-  import { downloadFile } from '/@/utils/common/renderUtils';
-  const checkedKeys = ref<Array<string | number>>([]);
-  //注册model
-  const [registerModal, {openModal}] = useModal();
-  //注册table数据
-  const { prefixCls,tableContext,onExportXls,onImportXls } = useListPage({
-      tableProps:{
-           title: '导游表',
-           api: list,
-           columns,
-           canResize:false,
-           formConfig: {
-              //labelWidth: 120,
-              schemas: searchFormSchema,
-              autoSubmitOnEnter:true,
-              showAdvancedButton:true,
-              fieldMapToNumber: [
-              ],
-              fieldMapToTime: [
-              ],
-            },
-           actionColumn: {
-               width: 120,
-               fixed:'right'
-            },
-      },
-       exportConfig: {
-            name:"导游表",
-            url: getExportUrl,
-          },
-          importConfig: {
-            url: getImportUrl,
-            success: handleSuccess
-          },
-  })
+  export default defineComponent({
+    components: {
+      DownOutlined,
+    },
+    setup() {
+      const columns = ref<TableColumnsType>([
+        {
+          title: '头像',
+          width: 100,
+          dataIndex: 'avatar',
+          fixed: 'left',
+          ellipsis: true,
+          align: 'center',
+        },
+        {
+          title: '姓名',
+          width: 100,
+          dataIndex: 'name',
+          fixed: 'left',
+          align: 'center',
+        },
+        {
+          title: '性别',
+          dataIndex: 'sex',
+          width: 150,
+          align: 'center',
+        },
+        {
+          title: '祖籍',
+          dataIndex: 'descent',
+          width: 150,
+          align: 'center',
+        },
+        {
+          title: '从业年限',
+          dataIndex: 'employmentTime',
+          width: 150,
+          align: 'center',
+        },
+        {
+          title: '瀑布摘要',
+          dataIndex: 'summary',
+          width: 150,
+          ellipsis: true,
+          align: 'center',
+        },
+        {
+          title: '擅长景点',
+          dataIndex: 'greatSpots',
+          key: 'greatSpots',
+          width: 250,
+          align: 'center',
+        },
+        {
+          title: '个人介绍',
+          dataIndex: 'introduction',
+          width: 150,
+          ellipsis: true,
+          align: 'center',
+        },
+        {
+          title: '从业资质',
+          dataIndex: 'qualifications',
+          width: 150,
+          ellipsis: true,
+          align: 'center',
+        },
+        {
+          title: '头衔',
+          dataIndex: 'honor',
+          width: 150,
+          align: 'center',
+        },
+        {
+          title: '点赞数量',
+          dataIndex: 'likeNum',
+          width: 150,
+          align: 'center',
+        },
+        {
+          title: '操作',
+          key: 'operation',
+          fixed: 'right',
+          width: 180,
+        },
+      ]);
 
-  const [registerTable, {reload},{ rowSelection, selectedRowKeys }] = tableContext
+      interface DataItem {
+        id: string;
+        name: string;
+        age: string;
+        sex: string;
+        descent: string;
+        employmentTime: string;
+        summary: string;
+        greatSpots: [];
+        introduction: string;
+        qualifications: string;
+        honor: string;
+        likeNum: string;
+      }
 
-   /**
-    * 新增事件
-    */
-  function handleAdd() {
-     openModal(true, {
-       isUpdate: false,
-       showFooter: true,
-     });
-  }
-   /**
-    * 编辑事件
-    */
-  function handleEdit(record: Recordable) {
-     openModal(true, {
-       record,
-       isUpdate: true,
-       showFooter: true,
-     });
-   }
-   /**
-    * 详情
-   */
-  function handleDetail(record: Recordable) {
-     openModal(true, {
-       record,
-       isUpdate: true,
-       showFooter: false,
-     });
-   }
-   /**
-    * 删除事件
-    */
-  async function handleDelete(record) {
-     await deleteOne({id: record.id}, handleSuccess);
-   }
-   /**
-    * 批量删除事件
-    */
-  async function batchHandleDelete() {
-     await batchDelete({ids: selectedRowKeys.value}, handleSuccess);
-   }
-   /**
-    * 成功回调
-    */
-  function handleSuccess() {
-      (selectedRowKeys.value = []) && reload();
-   }
-   /**
-      * 操作栏
-      */
-  function getTableAction(record){
-       return [
-         {
-           label: '编辑',
-           onClick: handleEdit.bind(null, record),
-         }
-       ]
-   }
-     /**
-        * 下拉操作栏
-        */
-  function getDropDownAction(record){
-       return [
-         {
-           label: '详情',
-           onClick: handleDetail.bind(null, record),
-         }, {
-           label: '删除',
-           popConfirm: {
-             title: '是否确认删除',
-             confirm: handleDelete.bind(null, record),
-           }
-         }
-       ]
-   }
+      let data: Ref<DataItem[]> = ref([]);
 
+      const getAllGuideList = async () => {
+        let params = {
+          pageNo: 1,
+          pageSize: 10,
+        };
+        const res = await getGuideList(params);
+        console.log('res==', res);
+        data.value = res.records;
+        console.log('data.value==', data.value);
+      };
+      getAllGuideList();
 
+      return {
+        data,
+        columns,
+        fixedTop: ref(false),
+        getGuideList,
+        getAllGuideList,
+      };
+    },
+  });
 </script>
-
-<style scoped>
-
+<style>
+  #components-table-demo-summary tfoot th,
+  #components-table-demo-summary tfoot td {
+    background: #fafafa;
+  }
+  [data-theme='dark'] #components-table-demo-summary tfoot th,
+  [data-theme='dark'] #components-table-demo-summary tfoot td {
+    background: #1d1d1d;
+  }
 </style>
