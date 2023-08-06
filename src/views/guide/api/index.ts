@@ -3,10 +3,14 @@ import { defHttp } from '/@/utils/http/axios';
 
 enum Api {
   guideList = '/guide/touristGuide/listAll',
+  guideListByName = '/guide/touristGuide/listByName',
+  uploadGuideImg = '/guide/touristGuide/uploadGuideImg',
+  addGuide = '/guide/touristGuide/addOrEdit',
+  deleteGuideById = '/guide/touristGuide/delete',
 }
 
 /**
- * 根据id查询产品日程和任务
+ * 查询导游信息
  * @param params
  */
 export const getGuideList = (params) => {
@@ -14,49 +18,33 @@ export const getGuideList = (params) => {
 };
 
 /**
- * 根据日程id编辑产品日程
- * @param data
+ * 根据name查询导游信息
+ * @param params
  */
-export const editScheduleById = (data) => {
-  return defHttp.post({ url: Api.editSchedule, data });
+export const guideListByName = (params) => {
+  return defHttp.get({ url: Api.guideListByName, params });
 };
 
 /**
- * 编辑or新增日程和任务
+ * 新增/编辑导游
  * @param data
  */
-export const andOrEditScheduleAndTask = (data) => {
-  return defHttp.post({ url: Api.andOrEdit, data });
+export const addGuide = (data) => {
+  return defHttp.post({ url: Api.addGuide, data });
 };
 
 /**
- * 根据id删除某个任务
+ * 根据id删除某个导游
  * @param data
  */
-export const deleteTask = (data) => {
-  return defHttp.delete({ url: Api.deleteTaskById, data });
-};
-
-/**
- * 通过日程id删除日程和相关任务
- * @param data
- */
-export const deleteScheduleAndTask = (data) => {
-  return defHttp.delete({ url: Api.deleteScheduleAndTask, data });
-};
-
-/**
- * 通过产品id添加日程
- * @param data
- */
-export const addScheduleByProId = (data) => {
-  return defHttp.post({ url: Api.addScheduleByProId, data });
+export const deleteGuideById = (data) => {
+  return defHttp.delete({ url: Api.deleteGuideById, data }, { joinParamsToUrl: true });
 };
 
 /**
  * 上传图片返回url
  * @param data
  */
-export const uploadTaskImg = (data) => {
-  return defHttp.post({ url: Api.uploadTaskImg, data });
+export const uploadGuideImg = (data) => {
+  return defHttp.post({ url: Api.uploadGuideImg, data });
 };

@@ -60,7 +60,6 @@
                         :customRequest="customRequest"
                         list-type="picture-card"
                         name="file"
-                        :multiple="true"
                         @preview="handlePreview"
                         @change="uploadChange"
                       >
@@ -85,7 +84,6 @@
                       v-model:file-list="tasksImgsList[index]"
                       :customRequest="customRequest"
                       name="file"
-                      :multiple="true"
                       list-type="picture-card"
                       @preview="handlePreview"
                       @remove="pictureRemove"
