@@ -7,6 +7,8 @@ enum Api {
   uploadGuideImg = '/guide/touristGuide/uploadGuideImg',
   addGuide = '/guide/touristGuide/addOrEdit',
   deleteGuideById = '/guide/touristGuide/delete',
+  getGuideListByProId = '/productguide/productGuide/queryByProId',
+  editProductGuide = '/productguide/productGuide/addOrEdit',
 }
 
 /**
@@ -15,6 +17,14 @@ enum Api {
  */
 export const getGuideList = (params) => {
   return defHttp.get({ url: Api.guideList, params });
+};
+
+/**
+ * 通过产品id查询导游信息
+ * @param params
+ */
+export const getGuideListByProId = (params) => {
+  return defHttp.get({ url: Api.getGuideListByProId, params });
 };
 
 /**
@@ -47,4 +57,12 @@ export const deleteGuideById = (data) => {
  */
 export const uploadGuideImg = (data) => {
   return defHttp.post({ url: Api.uploadGuideImg, data });
+};
+
+/**
+ * 添加/编辑产品和导游的关系
+ * @param data
+ */
+export const editProductGuide = (data) => {
+  return defHttp.post({ url: Api.editProductGuide, data });
 };

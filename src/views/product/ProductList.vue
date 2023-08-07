@@ -32,10 +32,14 @@
                       </a-modal>
                     </a-menu-item>
                     <a-menu-item>
-                      <a>批次套餐</a>
+                      <a-button type="text">批次套餐</a-button>
                     </a-menu-item>
                     <a-menu-item>
-                      <a>行程套餐</a>
+                      <a-button type="text">行程套餐</a-button>
+                    </a-menu-item>
+                    <a-menu-item>
+                      <a-button @click="showGuideManageModal" type="text">推荐导游</a-button>
+                      <GuideManage :proId="record.id" ref="GuideManageModal" />
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -154,6 +158,7 @@
   import { createVNode, defineComponent } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
   import ScheduleList from '../schedule/scheduleList.vue';
+  import GuideManage from '../guide/components/guideManage.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -545,7 +550,7 @@
     });
   };
 
-  /**---------------------------------------调用日程价格组件--------------------------------------------------**/
+  /**---------------------------------------调用日期价格组件--------------------------------------------------**/
   const open = ref(false);
   const childRef = ref();
   const getChild = () => {
@@ -563,6 +568,12 @@
   const ScheduleModal = ref();
   const showScheduleModal = () => {
     ScheduleModal.value.showModal();
+  };
+
+  /**---------------------------------------调用推荐导游组件--------------------------------------------------**/
+  const GuideManageModal = ref();
+  const showGuideManageModal = () => {
+    GuideManageModal.value.showModal();
   };
 </script>
 

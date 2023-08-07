@@ -7,7 +7,7 @@ enum Api {
   getProductList = '/core/product/productList',
   saveOrUpdate = '/core/product/temporarySaveOrUpdate',
   deleteOne = '/core/product/delete',
-  uploadImg = "/core/product/temporaryUploadImg"
+  uploadImg = '/core/product/temporaryUploadImg',
 }
 
 /**
@@ -32,7 +32,6 @@ export const deleteOne = (params, handleSuccess) => {
     handleSuccess();
   });
 };
-
 
 export const uploadImg = (data) => {
   return defHttp.post({ url: Api.uploadImg, data });
