@@ -26,7 +26,7 @@
                       <a-button @click="showBigModal" type="text">日程价格</a-button>
                       <a-modal v-model:visible="open" title="日程价格" width="100%" wrapClassName="full-modal" cancelText="关闭" :footer="null">
                         <DatePrice ref="childRef" :ProId="record.id" />
-                        <template slot="footer">
+                        <template #footer>
                           <a-button @click="handleCancel">关闭</a-button>
                         </template>
                       </a-modal>
@@ -49,7 +49,21 @@
                       </a-modal>
                     </a-menu-item>
                     <a-menu-item>
-                      <a-button type="text">行程套餐</a-button>
+                      <a-button @click="goJourney" type="text">行程套餐</a-button>
+                      <a-modal
+                        @ok="closeJourney"
+                        v-model:visible="openJourney"
+                        title="行程套餐"
+                        width="100%"
+                        wrapClassName="full-modal"
+                        cancelText="关闭"
+                        :footer="null"
+                      >
+                        <BatchPackage :pro-id="record.id" />
+                        <template #footer>
+                          <a-button @click="openJourney = false">关闭</a-button>
+                        </template>
+                      </a-modal>
                     </a-menu-item>
                     <a-menu-item>
                       <a-button @click="showGuideManageModal" type="text">推荐导游</a-button>
@@ -563,6 +577,14 @@
       e.file.url = res[0];
       e.onSuccess(res[0], e);
     });
+  };
+  const openJourney = ref(false);
+  const goJourney = () => {
+    openJourney.value = true;
+  };
+  const closeJourney = (e) => {
+    console.log(e);
+    openJourney.value = false;
   };
   const openBatch = ref(false);
   const goBatch = () => {
