@@ -73,6 +73,10 @@
                       <a-button type="text" @click="showTagModal">产品标签</a-button>
                       <Tag :proId="record.id" ref="showTag"></Tag>
                     </a-menu-item>
+                    <a-menu-item>
+                      <a-button type="text" @click="showChargeModal">费用说明</a-button>
+                      <Charge :proId="record.id" ref="showCharge"></Charge>
+                    </a-menu-item>
                   </a-menu>
                 </template>
               </a-dropdown>
@@ -194,6 +198,7 @@
   import BatchPackage from '../package/batch.vue';
   import JourneyPackage from '../package/journey.vue';
   import Tag from '../tag/tag.vue';
+  import Charge from '../charge/charge.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -631,8 +636,11 @@
  const showTagModal = () =>{
   setTimeout(() => {
     showTag.value.showModal();
-  },150)
-    
+  },150) 
+  }
+  const showCharge  = ref();
+  const showChargeModal = () =>{
+    showCharge.value.showModal();
   }
 </script>
 
