@@ -69,6 +69,10 @@
                       <a-button @click="showGuideManageModal" type="text">推荐导游</a-button>
                       <GuideManage :proId="record.id" ref="GuideManageModal" />
                     </a-menu-item>
+                    <a-menu-item>
+                      <a-button type="text" @click="showTagModal">产品标签</a-button>
+                      <Tag :proId="record.id" ref="showTag"></Tag>
+                    </a-menu-item>
                   </a-menu>
                 </template>
               </a-dropdown>
@@ -189,6 +193,7 @@
   import GuideManage from '../guide/components/guideManage.vue';
   import BatchPackage from '../package/batch.vue';
   import JourneyPackage from '../package/journey.vue';
+  import Tag from '../tag/tag.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -621,6 +626,14 @@
   const showGuideManageModal = () => {
     GuideManageModal.value.showModal();
   };
+ /**---------------------------------------调用标签组件--------------------------------------------------**/
+  const showTag  = ref();
+ const showTagModal = () =>{
+  setTimeout(() => {
+    showTag.value.showModal();
+  },150)
+    
+  }
 </script>
 
 <style lang="less">
