@@ -1,11 +1,11 @@
 import { defHttp } from '/src/utils/http/axios';
 
 enum Api {
-  ById = 'core/batchPackage/queryByProId',
-  Delete = 'core/batchPackage/delete',
-  Add = 'core/batchPackage/add',
-  Update = 'core/batchPackage/edit',
-  List = 'core/batchPackage/list',
+  ById = '/core/batchPackage/queryByProId',
+  Delete = '/core/batchPackage/delete',
+  Add = '/core/batchPackage/add',
+  Update = '/core/batchPackage/edit',
+  List = '/core/batchPackage/list',
 }
 
 export function getBatch(params: { proId: string }) {

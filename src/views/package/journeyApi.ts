@@ -1,11 +1,11 @@
 import { defHttp } from '/src/utils/http/axios';
 
 enum Api {
-  ById = 'core/journeyPackage/queryByProId',
-  Delete = 'core/journeyPackage/delete',
-  Add = 'core/journeyPackage/add',
-  Update = 'core/journeyPackage/edit',
-  List = 'core/journeyPackage/list',
+  ById = '/core/journeyPackage/queryByProId',
+  Delete = '/core/journeyPackage/delete',
+  Add = '/core/journeyPackage/add',
+  Update = '/core/journeyPackage/edit',
+  List = '/core/journeyPackage/list',
 }
 
 export function getJourney(params: { proId: string }) {

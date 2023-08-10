@@ -3,7 +3,7 @@
     <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加</a-button>
     <a-table :columns="columns" :data-source="dataSource" bordered>
       <template #bodyCell="{ column, text, record }">
-        <template v-if="['bpContent', 'bpPrice'].includes(column.dataIndex)">
+        <template v-if="['jpContent', 'jpPrice'].includes(column.dataIndex)">
           <div>
             <a-input v-if="editableData[record.key]" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
             <template v-else>
@@ -35,8 +35,10 @@
   import { cloneDeep } from 'lodash-es';
   import { reactive, ref } from 'vue';
   import type { UnwrapRef } from 'vue';
-  import { getJourney, addJourney, deleteJourney, getJourneyList, updateJourney } from './journeyApi';
-
+  import { getJourney, addJourney, deleteJourney, updateJourney } from './journeyApi';
+  const props = defineProps({
+    ProId: String,
+  });
   const columns = [
     {
       title: '行程套餐内容',
@@ -57,9 +59,11 @@
     },
   ];
   interface DataItem {
+    id: string;
+    proId: string;
     key: string;
-    bpContent: string;
-    bpPrice: number;
+    jpContent: string;
+    jpPrice: number;
   }
   const data: DataItem[] = [];
   // for (let i = 0; i < 100; i++) {
@@ -73,25 +77,22 @@
   //     likeCount: 'string',
   //   });
   // }
+  const dataSource = ref(data);
   let counter = 0;
   function getList() {
     // const page = {
     //   pageNo: 1,
     //   pageSize: 10,
     // };
-    getJourneyList(props.ProId).then((res) => {
-      dataSource.value = res.records;
+    getJourney({ proId: props.ProId }).then((res) => {
+      dataSource.value = res;
       dataSource.value.forEach((item) => {
         item.key = (counter++).toString();
       });
       console.log(dataSource.value);
     });
   }
-  const props = defineProps({
-    ProId: String,
-  });
 
-  const dataSource = ref(data);
   const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 
   const edit = (key: string) => {
@@ -106,6 +107,7 @@
     if (!hasAdding) {
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
       console.log(editableData[key]);
+      editableData[key].id = dataSource.value.filter((item) => key === item.key)[0].id;
       updateJourney(editableData[key]).then((res) => {
         console.log(res);
         console.log(editableData[key]);
@@ -133,9 +135,11 @@
   const handleAdd = () => {
     if (!hasAdding) {
       const newData = {
+        id: '',
+        proId: props.ProId,
         key: `${++counter}`,
-        bpPrice: 0,
-        bpContent: '',
+        jpPrice: 0,
+        jpContent: '',
       };
       dataSource.value.push(newData);
       editableData[counter] = newData;
@@ -144,52 +148,6 @@
   };
 
   getList();
-
-  // const columns = [
-  //   {
-  //     title: '攻略标题',
-  //     width: 180,
-  //     dataIndex: 'title',
-  //     key: 'title',
-  //     fixed: 'left',
-  //   },
-  //   {
-  //     title: '攻略内容',
-  //     width: 180,
-  //     dataIndex: 'content',
-  //     key: 'content',
-  //   },
-  //   {
-  //     title: '转发数',
-  //     dataIndex: 'forwardCount',
-  //     key: 'forwardCount',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '攻略图片',
-  //     dataIndex: 'img',
-  //     key: 'img',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '点赞数',
-  //     dataIndex: 'likeCount',
-  //     key: 'likeCount',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '攻略用户id',
-  //     dataIndex: 'userid',
-  //     key: 'userid',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '操作',
-  //     key: 'operation',
-  //     fixed: 'right',
-  //     width: 180,
-  //   },
-  // ];
 </script>
 <style scoped>
   .editable-row-operations a {

@@ -42,7 +42,7 @@
                         cancelText="关闭"
                         :footer="null"
                       >
-                        <BatchPackage :pro-id="record.id" />
+                        <BatchPackage :ProId="record.id" />
                         <template #footer>
                           <a-button @click="openBatch = false">关闭</a-button>
                         </template>
@@ -59,7 +59,7 @@
                         cancelText="关闭"
                         :footer="null"
                       >
-                        <BatchPackage :pro-id="record.id" />
+                        <JourneyPackage :ProId="record.id" />
                         <template #footer>
                           <a-button @click="openJourney = false">关闭</a-button>
                         </template>
@@ -188,6 +188,7 @@
   import ScheduleList from '../schedule/scheduleList.vue';
   import GuideManage from '../guide/components/guideManage.vue';
   import BatchPackage from '../package/batch.vue';
+  import JourneyPackage from '../package/journey.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
