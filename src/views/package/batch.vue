@@ -35,8 +35,11 @@
   import { cloneDeep } from 'lodash-es';
   import { reactive, ref } from 'vue';
   import type { UnwrapRef } from 'vue';
-  import { getBatch, updateBatch, addBatch, deleteBatch, getBatchList } from './batchApi';
-
+  import { getBatch, updateBatch, addBatch, deleteBatch } from './batchApi';
+  const props = defineProps({
+    ProId: String,
+  });
+  console.log('props', props);
   const columns = [
     {
       title: '批次套餐内容',
@@ -57,6 +60,8 @@
     },
   ];
   interface DataItem {
+    id: string;
+    proId: string;
     key: string;
     bpContent: string;
     bpPrice: number;
@@ -73,25 +78,22 @@
   //     likeCount: 'string',
   //   });
   // }
+  const dataSource = ref(data);
   let counter = 0;
   function getList() {
     // const page = {
     //   pageNo: 1,
     //   pageSize: 10,
     // };
-    getBatchList(props.ProId).then((res) => {
-      dataSource.value = res.records;
+    getBatch({ proId: props.ProId }).then((res) => {
+      dataSource.value = res;
       dataSource.value.forEach((item) => {
         item.key = (counter++).toString();
       });
       console.log(dataSource.value);
     });
   }
-  const props = defineProps({
-    ProId: String,
-  });
 
-  const dataSource = ref(data);
   const editableData: UnwrapRef<Record<string, DataItem>> = reactive({});
 
   const edit = (key: string) => {
@@ -100,12 +102,13 @@
   };
   const save = (key: string) => {
     console.log(hasAdding);
-    console.log(editableData[key]);
+    console.log('editableData[key]', editableData[key]);
     console.log(hasAdding && editableData[key]);
     console.log(!hasAdding && editableData[key]);
     if (!hasAdding) {
       Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData[key]);
       console.log(editableData[key]);
+      editableData[key].id = dataSource.value.filter((item) => key === item.key)[0].id;
       updateBatch(editableData[key]).then((res) => {
         console.log(res);
         console.log(editableData[key]);
@@ -133,6 +136,8 @@
   const handleAdd = () => {
     if (!hasAdding) {
       const newData = {
+        id: '',
+        proId: props.ProId,
         key: `${++counter}`,
         bpPrice: 0,
         bpContent: '',
@@ -144,52 +149,6 @@
   };
 
   getList();
-
-  // const columns = [
-  //   {
-  //     title: '攻略标题',
-  //     width: 180,
-  //     dataIndex: 'title',
-  //     key: 'title',
-  //     fixed: 'left',
-  //   },
-  //   {
-  //     title: '攻略内容',
-  //     width: 180,
-  //     dataIndex: 'content',
-  //     key: 'content',
-  //   },
-  //   {
-  //     title: '转发数',
-  //     dataIndex: 'forwardCount',
-  //     key: 'forwardCount',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '攻略图片',
-  //     dataIndex: 'img',
-  //     key: 'img',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '点赞数',
-  //     dataIndex: 'likeCount',
-  //     key: 'likeCount',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '攻略用户id',
-  //     dataIndex: 'userid',
-  //     key: 'userid',
-  //     width: 150,
-  //   },
-  //   {
-  //     title: '操作',
-  //     key: 'operation',
-  //     fixed: 'right',
-  //     width: 180,
-  //   },
-  // ];
 </script>
 <style scoped>
   .editable-row-operations a {
