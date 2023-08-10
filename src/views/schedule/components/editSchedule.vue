@@ -38,11 +38,12 @@
                     <a-select-option value="晚餐">晚餐</a-select-option>
                     <a-select-option value="交通">交通</a-select-option>
                     <a-select-option value="景点/场馆">景点/场馆</a-select-option>
+                    <a-select-option value="自由活动">自由活动</a-select-option>
                     <a-select-option value="酒店">酒店</a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="任务详情" name="taskContent">
-                  <a-input v-model:value="task.taskContent" placeholder="请输入任务详情" />
+                  <a-textarea v-model:value="task.taskContent" placeholder="请输入任务详情" allow-clear />
                 </a-form-item>
                 <a-form-item label="任务时间" name="taskDate"> <a-input v-model:value="task.taskDate" placeholder="请输入任务时间" /> </a-form-item>
                 <a-form-item label="任务地点" name="taskAddress">
