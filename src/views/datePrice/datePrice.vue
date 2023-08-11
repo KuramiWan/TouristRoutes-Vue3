@@ -181,9 +181,15 @@
     // return false;
   };
   const save2 = (key: string) => {
-    Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData2[key]);
-    console.log(dataSource.value[key]);
-    delete editableData2[key];
+    const item = dataSource.value.filter((item) => key === item.key)[0];
+    if (editableData2[key].price < 0) {
+      message.error('数据填写错误！！！');
+      delete editableData2[key];
+    } else {
+      Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData2[key]);
+      console.log(dataSource.value[key]);
+      delete editableData2[key];
+    }
   };
   const save3 = (key: string) => {
     const item = dataSource.value.filter((item) => key === item.key)[0];
