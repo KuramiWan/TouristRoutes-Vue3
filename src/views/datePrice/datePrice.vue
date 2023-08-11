@@ -131,11 +131,11 @@
       width: '20%',
     },
     {
-      title: '价格',
+      title: '价格浮动(整数为上升，负数为减少)',
       dataIndex: 'price',
     },
     {
-      title: '当天报名人数(注：当天报名人数 <= 最多报名人数)',
+      title: '已报名人数',
       dataIndex: 'thatDay',
       width: '27%',
     },
@@ -181,15 +181,10 @@
     // return false;
   };
   const save2 = (key: string) => {
-    const item = dataSource.value.filter((item) => key === item.key)[0];
-    if (editableData2[key].price < 0) {
-      message.error('数据填写错误！！！');
-      delete editableData2[key];
-    } else {
-      Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData2[key]);
-      console.log(dataSource.value[key]);
-      delete editableData2[key];
-    }
+    Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData2[key]);
+    console.log(dataSource.value[key].date);
+    console.log('ProId', props.ProId);
+    delete editableData2[key];
   };
   const save3 = (key: string) => {
     const item = dataSource.value.filter((item) => key === item.key)[0];
