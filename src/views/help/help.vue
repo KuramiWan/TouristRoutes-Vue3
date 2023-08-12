@@ -3,7 +3,7 @@
     <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加日程</a-button>
     <a-button type="primary" danger style="width: 150px; margin: 5px 20px; float: right; margin-right: 10px" @click="commitSave">保存</a-button>
     <a-alert style="width: 100%; text-align: center; font-weight: bold; font-size: 15px" message="修改后请记得保存或确认" type="warning" closable />
-    <a-table bordered :data-source="dataSource" :columns="columns">
+    <a-table :data-source="dataSource" :columns="columns" bordered :pagination="ipagination" @change="handleTableChange">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'questionTitle'">
           <div class="editable-cell">
@@ -46,7 +46,7 @@ import { computed, createVNode, onMounted, reactive, ref } from 'vue';
 import type { Ref, UnwrapRef } from 'vue';
 import { CheckOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
-import { getPageList, SavePageList,DeleHelpById,AddHelpOne } from './api';
+import { getPageList, SavePageList, DeleHelpById, AddHelpOne } from './api';
 import { Modal } from 'ant-design-vue';
 
 interface HelpItem {
@@ -63,20 +63,63 @@ interface Help {
 }
 
 const HelpList: Ref<HelpItem[]> = ref([]);
-var params = ref();
-onMounted(() => {
-  getPageList(params).then(res => {
-    for (let i = 0; i < res.records.length; i++) {
-      const item: HelpItem = {
-        id: res.records[i].id,
-        key: i.toString(),
-        questionTitle: res.records[i].questionTitle,
-        answer: res.records[i].answer,
-      };
-      HelpList.value.push(item);
-    }
-  });
+let counter = 0;
+let allStra = ref();
+let ipagination = ref()
+const page = {
+  pageNo: 1,
+  pageSize: 20,
+};
+function getList(){
+  getPageList(page).then((res) => {
+  for (let i = 0; i < res.records.length; i++) {
+    const item: HelpItem = {
+      id: res.records[i].id,
+      key: i.toString(),
+      questionTitle: res.records[i].questionTitle,
+      answer: res.records[i].answer,
+    };
+    HelpList.value.push(item);
+  }
+  allStra.value = res.total;
+  var pagenation = {
+    size: 'large',
+    current: 1,
+    total: allStra.value,
+    pageSize: 20,
+    showTotal: (total, range) => {
+      return range[0] + '-' + range[1] + ' 共' + total + '条';
+    }, //展示每页第几条至第几条和总数
+    hideOnSinglePage: false, // 只有一页时是否隐藏分页器
+    showQuickJumper: true, //是否可以快速跳转至某页
+    showSizeChanger: true, //是否可以改变pageSize
+  };
+  ipagination.value = pagenation
 });
+}
+
+getList()
+
+function getList2() {
+  getPageList(page).then((res) => {
+    dataSource.value = res.records;
+    allStra = res.total;
+    // debugger
+    dataSource.value.forEach((item) => {
+      item.key = (counter++).toString();
+    });
+  });
+}
+
+const handleTableChange = function (pagination, filters, sorter) {
+  // console.log(allStra)
+  // console.log(pagination)
+  page.pageNo = pagination.current;
+  page.pageSize = pagination.pageSize;
+  ipagination.value = pagination;
+  getList2();
+  console.log(dataSource.value)
+};
 
 const columns = [
   {
@@ -117,9 +160,8 @@ const save2 = (key: string) => {
   delete editableData2[key];
 };
 
-
 const commitSave = () => {
-    const help: Ref<Help[]> = ref([]);
+  const help: Ref<Help[]> = ref([]);
   Modal.confirm({
     title: '确定要保存吗',
     icon: createVNode(ExclamationCircleOutlined),
@@ -132,12 +174,12 @@ const commitSave = () => {
             questionTitle: element.questionTitle,
             answer: element.answer,
           };
-          
+
           help.value.push(helpOne);
         });
-        console.log(help.value)
+        // console.log(help.value);
         SavePageList(help.value).then(() => {
-          getPageList(params);
+          // getList2();
         });
         setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
       }).catch(() => console.log('错误'));
@@ -149,45 +191,45 @@ const commitSave = () => {
   });
 };
 
-
 const count = computed(() => dataSource.value.length);
 const handleAdd = () => {
-    
-    const help2 ={
-      questionTitle: "",
-      answer: ""
-    };
-
-    var newId: string;
-    AddHelpOne(help2).then((res) => {
-      console.log(res);
-      newId = res;
-      const newData = {
-        id: newId,
-        key: `${count.value}`,
-        questionTitle: "",
-        answer: ""
-      };
-      dataSource.value.push(newData);
-      console.log(dataSource.value);
-    });
+  const help2 = {
+    questionTitle: '',
+    answer: '',
   };
 
+  var newId: string;
+  AddHelpOne(help2).then((res) => {
+    // console.log(res);
+    newId = res;
+    const newData = {
+      id: newId,
+      key: `${count.value}`,
+      questionTitle: '',
+      answer: '',
+    };
+    dataSource.value.push(newData);
+    console.log(dataSource.value);
+    // getList()
+    // getList2();
+  });
+  // getList2()
+};
 
 const onDelete = (key: string) => {
-    console.log(dataSource.value[key]);
-    console.log(dataSource.value[key].id);
-    var param = {
-      id: dataSource.value[key].id,
-    };
-    console.log(param);
-    DeleHelpById(param).then((res) => {
-      console.log(res);
-    });
-    dataSource.value = dataSource.value.filter((item) => item.key !== key);
-    dataSource.value.length - 1;
-    console.log(dataSource.value);
+  // console.log(dataSource.value[key]);
+  // console.log(dataSource.value[key].id);
+  var param = {
+    id: dataSource.value[key].id,
   };
+  // console.log(param);
+  DeleHelpById(param).then(() => {
+    // console.log(res);
+  });
+  dataSource.value = dataSource.value.filter((item) => item.key !== key);
+  dataSource.value.length - 1;
+  // console.log(dataSource.value);
+};
 </script>
   
 <style lang="less"></style>

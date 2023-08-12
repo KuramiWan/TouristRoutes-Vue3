@@ -62,7 +62,7 @@ const columns = [
   {
     title: '点赞数',
     dataIndex: 'likeCount',
-    width: 150,
+    width: 150, 
   },
   {
     title: '攻略用户id',
