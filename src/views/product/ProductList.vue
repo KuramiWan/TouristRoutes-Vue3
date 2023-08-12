@@ -285,7 +285,7 @@
       align: 'center',
     },
     {
-      title: '产品时长',
+      title: '旅行日程/天',
       dataIndex: 'proDate',
       key: '4',
       width: 155,

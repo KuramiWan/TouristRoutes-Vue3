@@ -131,11 +131,11 @@
       width: '20%',
     },
     {
-      title: '价格',
+      title: '价格浮动(整数为上升，负数为减少)',
       dataIndex: 'price',
     },
     {
-      title: '当天报名人数(注：当天报名人数 <= 最多报名人数)',
+      title: '已报名人数',
       dataIndex: 'thatDay',
       width: '27%',
     },
@@ -182,7 +182,8 @@
   };
   const save2 = (key: string) => {
     Object.assign(dataSource.value.filter((item) => key === item.key)[0], editableData2[key]);
-    console.log(dataSource.value[key]);
+    console.log(dataSource.value[key].date);
+    console.log('ProId', props.ProId);
     delete editableData2[key];
   };
   const save3 = (key: string) => {
@@ -254,7 +255,6 @@
     });
   };
 
-  const priceDates: Ref<PriceDate[]> = ref([]);
   const commitSave = () => {
     Modal.confirm({
       title: '确定要保存吗',
@@ -262,6 +262,7 @@
       content: '保存修改的所有内容',
       onOk() {
         return new Promise((resolve, reject) => {
+          const priceDates: Ref<PriceDate[]> = ref([]);
           dataSource.value.forEach((element) => {
             const priceDate = {
               id: element.id,
@@ -278,7 +279,6 @@
             getDatePrice(params);
           });
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-          return true;
         }).catch(() => console.log('错误'));
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
