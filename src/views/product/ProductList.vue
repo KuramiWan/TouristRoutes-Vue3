@@ -31,7 +31,7 @@
                         </template>
                       </a-modal>
                     </a-menu-item>
-                    <a-menu-item>
+                    <!-- <a-menu-item>
                       <a-button @click="goBatch" type="text">批次套餐</a-button>
                       <a-modal
                         @ok="closeBatch"
@@ -47,7 +47,7 @@
                           <a-button @click="openBatch = false">关闭</a-button>
                         </template>
                       </a-modal>
-                    </a-menu-item>
+                    </a-menu-item> -->
                     <a-menu-item>
                       <a-button @click="goJourney" type="text">行程套餐</a-button>
                       <a-modal
@@ -631,17 +631,17 @@
   const showGuideManageModal = () => {
     GuideManageModal.value.showModal();
   };
- /**---------------------------------------调用标签组件--------------------------------------------------**/
-  const showTag  = ref();
- const showTagModal = () =>{
-  setTimeout(() => {
-    showTag.value.showModal();
-  },150) 
-  }
-  const showCharge  = ref();
-  const showChargeModal = () =>{
+  /**---------------------------------------调用标签组件--------------------------------------------------**/
+  const showTag = ref();
+  const showTagModal = () => {
+    setTimeout(() => {
+      showTag.value.showModal();
+    }, 150);
+  };
+  const showCharge = ref();
+  const showChargeModal = () => {
     showCharge.value.showModal();
-  }
+  };
 </script>
 
 <style lang="less">
