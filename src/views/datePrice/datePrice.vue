@@ -255,7 +255,6 @@
     });
   };
 
-  const priceDates: Ref<PriceDate[]> = ref([]);
   const commitSave = () => {
     Modal.confirm({
       title: '确定要保存吗',
@@ -263,6 +262,7 @@
       content: '保存修改的所有内容',
       onOk() {
         return new Promise((resolve, reject) => {
+          const priceDates: Ref<PriceDate[]> = ref([]);
           dataSource.value.forEach((element) => {
             const priceDate = {
               id: element.id,
@@ -279,7 +279,6 @@
             getDatePrice(params);
           });
           setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-          return true;
         }).catch(() => console.log('错误'));
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
