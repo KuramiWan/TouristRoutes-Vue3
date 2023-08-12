@@ -3,7 +3,7 @@
     <a-button class="editable-add-btn" style="margin-bottom: 8px" @click="handleAdd">添加</a-button>
     <a-table :columns="columns" :data-source="dataSource" bordered>
       <template #bodyCell="{ column, text, record }">
-        <template v-if="['jpContent', 'jpPrice'].includes(column.dataIndex)">
+        <template v-if="['jpContent', 'jpPriceAdult', 'jpPriceChild'].includes(column.dataIndex)">
           <div>
             <a-input v-if="editableData[record.key]" v-model:value="editableData[record.key][column.dataIndex]" style="margin: -5px 0" />
             <template v-else>
@@ -41,15 +41,21 @@
   });
   const columns = [
     {
-      title: '行程套餐内容',
+      title: '套餐内容',
       width: 180,
       dataIndex: 'jpContent',
       ellipsis: true,
     },
     {
-      title: '套餐价格',
+      title: '成人价格',
       width: 180,
-      dataIndex: 'jpPrice',
+      dataIndex: 'jpPriceAdult',
+      ellipsis: true,
+    },
+    {
+      title: '儿童价格',
+      width: 180,
+      dataIndex: 'jpPriceChild',
       ellipsis: true,
     },
     {
@@ -63,7 +69,8 @@
     proId: string;
     key: string;
     jpContent: string;
-    jpPrice: number;
+    jpPriceAdult: number;
+    jpPriceChild: number;
   }
   const data: DataItem[] = [];
   // for (let i = 0; i < 100; i++) {
@@ -138,7 +145,8 @@
         id: '',
         proId: props.ProId,
         key: `${++counter}`,
-        jpPrice: 0,
+        jpPriceAdult: 0,
+        jpPriceChild: 0,
         jpContent: '',
       };
       dataSource.value.push(newData);
