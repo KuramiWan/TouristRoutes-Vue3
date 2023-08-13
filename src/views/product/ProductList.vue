@@ -6,6 +6,9 @@
     <div class="table-container">
       <a-table bordered :columns="columns" :pagination="false" :data-source="currentData" :scroll="{ x: 1500, y: 1500 }">
         <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'proType'">
+            <span>{{ record.proType == 1 ? '景点' : '线路' }}</span>
+          </template>
           <!-- 操作单元格 -->
           <template v-if="column.dataIndex === 'operation'">
             <a-space>
@@ -109,6 +112,12 @@
                 <template v-if="column.dataIndex === 'proIntroduction'">
                   <!-- <textarea class="custom-textarea" v-model="formState[column.dataIndex]"></textarea> -->
                   <a-textarea v-model:value="formState[column.dataIndex]" show-count :maxlength="150" />
+                </template>
+                <template v-else-if="column.dataIndex === 'proType'">
+                  <a-select ref="selectType" v-model:value="formState[column.dataIndex]" placeholder="请选择产品类别">
+                    <a-select-option value="1">景点</a-select-option>
+                    <a-select-option value="2">线路</a-select-option>
+                  </a-select>
                 </template>
                 <!-- 如果是产品封面，那么采用图片模态框，渲染加上传 -->
                 <template v-else-if="column.dataIndex === 'proPageImg'">
@@ -223,6 +232,7 @@
           proEvaluate: record.proEvaluate || null,
           proIntroduction: record.proIntroduction || null,
           proDate: record.proDate || null,
+          proType: record.proType || null,
           proPageImg: record.proPageImg || null,
           posters: record.posters || null,
           proMan: record.proMan || null,
@@ -349,16 +359,23 @@
       align: 'center',
     },
     {
+      title: '产品类型',
+      dataIndex: 'proType',
+      key: '13',
+      width: 155,
+      align: 'center',
+    },
+    {
       title: '推荐指数',
       dataIndex: 'recNum',
-      key: '13',
+      key: '14',
       width: 155,
       align: 'center',
     },
     {
       title: '操作',
       dataIndex: 'operation',
-      key: '14',
+      key: '15',
       fixed: 'right',
       width: 180,
     },
