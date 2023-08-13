@@ -2,7 +2,7 @@
   <div>
     <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加日程</a-button>
     <a-button type="primary" danger style="width: 150px; margin: 5px 20px; float: right; margin-right: 10px" @click="commitSave">保存</a-button>
-    <a-table bordered :data-source="dataSource" :columns="columns">
+    <a-table bordered :data-source="dataSource" :columns="columns" pagination="false">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'date'">
           <div class="editable-cell">

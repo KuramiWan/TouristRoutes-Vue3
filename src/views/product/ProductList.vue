@@ -77,8 +77,13 @@
                       <Tag :proId="record.id" ref="showTag"></Tag>
                     </a-menu-item>
                     <a-menu-item>
-                      <a-button type="text" @click="showInsureModal">保险选项</a-button>
-                      <Insure :proId="record.id" ref="showInsure"></Insure>
+                      <a-button @click="showBigModal2" type="text">保险详情</a-button>
+                      <a-modal v-model:visible="open2" title="保险详情" width="100%" wrapClassName="full-modal" cancelText="关闭" :footer="null">
+                        <Insure :ProId="record.id" ref="childRef2"/>
+                        <template #footer>
+                          <a-button @click="handleCancel2">关闭</a-button>
+                        </template>
+                      </a-modal>
                     </a-menu-item>
                     <a-menu-item>
                       <a-button type="text" @click="showChargeModal">费用说明</a-button>
@@ -665,12 +670,18 @@
     showCharge.value.showModal();
   };
 
-  /**---------------------------------------调用标签组件--------------------------------------------------**/
-  const showInsure = ref();
-  const showInsureModal = () => {
-    setTimeout(() => {
-      showInsure.value.showModal();
-    }, 150);
+  /**---------------------------------------调用保险组件--------------------------------------------------**/
+  const open2 = ref(false);
+  const childRef2 = ref();
+  const getChild2 = () => {
+    // 第三步： 调用子组件的方法或者变量，通过value
+    childRef2.value.commitSave();
+  };
+  const showBigModal2 = () => {
+    open2.value = true;
+  };
+  const handleCancel2 = () => {
+    open2.value = false;
   };
 </script>
 
