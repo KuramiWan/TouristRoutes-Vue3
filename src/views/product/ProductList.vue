@@ -74,6 +74,10 @@
                       <Tag :proId="record.id" ref="showTag"></Tag>
                     </a-menu-item>
                     <a-menu-item>
+                      <a-button type="text" @click="showInsureModal">保险选项</a-button>
+                      <Insure :proId="record.id" ref="showInsure"></Insure>
+                    </a-menu-item>
+                    <a-menu-item>
                       <a-button type="text" @click="showChargeModal">费用说明</a-button>
                       <Charge :proId="record.id" ref="showCharge"></Charge>
                     </a-menu-item>
@@ -199,6 +203,7 @@
   import JourneyPackage from '../package/journey.vue';
   import Tag from '../tag/tag.vue';
   import Charge from '../charge/charge.vue';
+  import Insure from '../insure/insure.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -611,7 +616,7 @@
   const childRef = ref();
   const getChild = () => {
     // 第三步： 调用子组件的方法或者变量，通过value
-    childRef.value.commitSave('1683715194473160706');
+    childRef.value.commitSave();
   };
   const showBigModal = () => {
     open.value = true;
@@ -641,6 +646,14 @@
   const showCharge = ref();
   const showChargeModal = () => {
     showCharge.value.showModal();
+  };
+
+  /**---------------------------------------调用标签组件--------------------------------------------------**/
+  const showInsure = ref();
+  const showInsureModal = () => {
+    setTimeout(() => {
+      showInsure.value.showModal();
+    }, 150);
   };
 </script>
 
