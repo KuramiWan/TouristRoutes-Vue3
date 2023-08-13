@@ -44,8 +44,8 @@
                               class="schedule-icon"
                               src="../../assets/images/餐饮.png"
                             />
-                            <img v-if="schedule.tasks[0].taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
-                            <img v-if="schedule.tasks[0].taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '景點/場館'" class="schedule-icon" src="../../assets/images/景点.png" />
+                            <img v-if="schedule.tasks[0].taskTitle == '自由活動'" class="schedule-icon" src="../../assets/images/自由活动.png" />
                           </div>
                           <div>{{ schedule.tasks[0].taskDate }}</div>
                         </template>
@@ -79,8 +79,8 @@
                                 class="schedule-icon"
                                 src="../../assets/images/餐饮.png"
                               />
-                              <img v-if="task.taskTitle == '景点/场馆'" class="schedule-icon" src="../../assets/images/景点.png" />
-                              <img v-if="task.taskTitle == '自由活动'" class="schedule-icon" src="../../assets/images/自由活动.png" />
+                              <img v-if="task.taskTitle == '景點/場館'" class="schedule-icon" src="../../assets/images/景点.png" />
+                              <img v-if="task.taskTitle == '自由活動'" class="schedule-icon" src="../../assets/images/自由活动.png" />
                             </div>
                             <div>{{ task.taskDate }}</div>
                           </template>

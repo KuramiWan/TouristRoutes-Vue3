@@ -4,7 +4,7 @@ import { useMessage } from '/@/hooks/web/useMessage';
 const { createConfirm } = useMessage();
 
 enum Api {
-  getProductList = '/core/product/products',
+  getProductList = '/core/product/productAllList',
   saveOrUpdate = '/core/product/temporarySaveOrUpdate',
   deleteOne = '/core/product/delete',
   uploadImg = '/core/product/temporaryUploadImg',
