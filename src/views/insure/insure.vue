@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onActivated, onMounted, reactive, ref } from 'vue';
 import type { Ref, UnwrapRef } from 'vue';
 import { message } from 'ant-design-vue';
 import { CheckOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -63,6 +63,7 @@ import { createVNode } from 'vue';
 import { Modal } from 'ant-design-vue';
 import { cloneDeep } from 'lodash-es';
 import { GetInsureByProId, DeleteInsureById, AddInsureOne, UpdateInsureList } from './api';
+import { active } from 'sortablejs';
 // import axios from 'axios';
 
 interface InsureItem {
@@ -87,7 +88,7 @@ var params = {
   proId: props.ProId,
 };
 const Insures: Ref<InsureItem[]> = ref([]);
-onMounted(() => {
+  onMounted(()=>{
   GetInsureByProId(params).then((res) => {
     console.log('=============', res);
     for (let i = 0; i < res.length; i++) {
@@ -100,8 +101,9 @@ onMounted(() => {
       };
       Insures.value.push(item);
     }
+
   });
-});
+})
 
 const columns = [
   {
