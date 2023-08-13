@@ -37,8 +37,8 @@
                     <a-select-option value="午餐">午餐</a-select-option>
                     <a-select-option value="晚餐">晚餐</a-select-option>
                     <a-select-option value="交通">交通</a-select-option>
-                    <a-select-option value="景点/场馆">景点/场馆</a-select-option>
-                    <a-select-option value="自由活动">自由活动</a-select-option>
+                    <a-select-option value="景點/場館">景點/場館</a-select-option>
+                    <a-select-option value="自由活動">自由活動</a-select-option>
                     <a-select-option value="酒店">酒店</a-select-option>
                   </a-select>
                 </a-form-item>
