@@ -1,8 +1,8 @@
 <template>
   <div>
-    <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加日程</a-button>
+    <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加帮助中心问题</a-button>
     <a-button type="primary" danger style="width: 150px; margin: 5px 20px; float: right; margin-right: 10px" @click="commitSave">保存</a-button>
-    <a-alert style="width: 100%; text-align: center; font-weight: bold; font-size: 15px" message="修改后请记得保存或确认" type="warning" closable />
+    <a-alert style="width: 100%; text-align: center; font-weight: bold; font-size: 15px" message="修改后请记得保存或确认(一次只能添加一个)" type="warning" closable />
     <a-table :data-source="dataSource" :columns="columns" bordered :pagination="ipagination" @change="handleTableChange">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'questionTitle'">
@@ -47,7 +47,8 @@ import type { Ref, UnwrapRef } from 'vue';
 import { CheckOutlined, EditOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { cloneDeep } from 'lodash-es';
 import { getPageList, SavePageList, DeleHelpById, AddHelpOne } from './api';
-import { Modal } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
+import { error } from 'console';
 
 interface HelpItem {
   id: string;
@@ -66,12 +67,13 @@ const HelpList: Ref<HelpItem[]> = ref([]);
 let counter = 0;
 let allStra = ref();
 let ipagination = ref()
-const page = {
+let pages = ref()
+const page = ref({
   pageNo: 1,
-  pageSize: 20,
-};
+  pageSize: 10,
+});
 function getList(){
-  getPageList(page).then((res) => {
+  getPageList(page.value).then((res) => {
   for (let i = 0; i < res.records.length; i++) {
     const item: HelpItem = {
       id: res.records[i].id,
@@ -81,12 +83,13 @@ function getList(){
     };
     HelpList.value.push(item);
   }
+  pages.value = res.pages
   allStra.value = res.total;
   var pagenation = {
     size: 'large',
-    current: 1,
+    current: page.value.pageNo,
     total: allStra.value,
-    pageSize: 20,
+    pageSize: page.value.pageSize,
     showTotal: (total, range) => {
       return range[0] + '-' + range[1] + ' 共' + total + '条';
     }, //展示每页第几条至第几条和总数
@@ -101,9 +104,9 @@ function getList(){
 getList()
 
 function getList2() {
-  getPageList(page).then((res) => {
+  getPageList(page.value).then((res) => {
     dataSource.value = res.records;
-    allStra = res.total;
+    pages.value = res.pages;
     // debugger
     dataSource.value.forEach((item) => {
       item.key = (counter++).toString();
@@ -114,9 +117,11 @@ function getList2() {
 const handleTableChange = function (pagination, filters, sorter) {
   // console.log(allStra)
   // console.log(pagination)
-  page.pageNo = pagination.current;
-  page.pageSize = pagination.pageSize;
+  page.value.pageNo = pagination.current;
+  page.value.pageSize = pagination.pageSize;
   ipagination.value = pagination;
+  allStra.value = pagination.total;
+  console.log(pagination)
   getList2();
   console.log(dataSource.value)
 };
@@ -197,6 +202,10 @@ const handleAdd = () => {
     questionTitle: '',
     answer: '',
   };
+  console.log(ipagination.value)
+  if(ipagination.value.current == pages.value){
+
+ 
 
   var newId: string;
   AddHelpOne(help2).then((res) => {
@@ -209,11 +218,15 @@ const handleAdd = () => {
       answer: '',
     };
     dataSource.value.push(newData);
-    console.log(dataSource.value);
+    console.log(newId);
     // getList()
     // getList2();
   });
   // getList2()
+}
+else{
+  message.error("请到最后一页添加")
+}
 };
 
 const onDelete = (key: string) => {
