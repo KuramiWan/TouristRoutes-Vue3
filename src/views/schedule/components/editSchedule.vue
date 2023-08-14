@@ -37,8 +37,8 @@
                     <a-select-option value="午餐">午餐</a-select-option>
                     <a-select-option value="晚餐">晚餐</a-select-option>
                     <a-select-option value="交通">交通</a-select-option>
-                    <a-select-option value="景點/場館">景點/場館</a-select-option>
-                    <a-select-option value="自由活動">自由活動</a-select-option>
+                    <a-select-option value="景点/场馆">景点/场馆</a-select-option>
+                    <a-select-option value="自由活动">自由活动</a-select-option>
                     <a-select-option value="酒店">酒店</a-select-option>
                   </a-select>
                 </a-form-item>
@@ -150,7 +150,7 @@
       const onClose = () => {
         // tasksImgsList.value = [];
         visible.value = false;
-        ctx.emit('changeVisible', visible.value);
+        ctx.emit('changeVisible', visible.value, form.value);
       };
 
       const form = ref<any>(props.schedule);
@@ -175,7 +175,7 @@
         console.log('form.value', form.value);
         await andOrEditScheduleAndTask(form.value);
         visible.value = false;
-        ctx.emit('changeVisible', visible.value);
+        ctx.emit('changeVisible', visible.value, form.value);
       };
 
       const previewVisible = ref(false);
@@ -281,8 +281,9 @@
     watch: {
       editScheduleVisible(newValue) {
         // 更新存储每个task的图片的集合
-        // console.log('newValue', newValue);
+        // console.log('this.form', this.form);
         this.visible = newValue;
+        // this.form = this.form;
       },
       schedule(newValue) {
         console.log('newValue', newValue);

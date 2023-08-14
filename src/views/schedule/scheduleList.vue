@@ -134,7 +134,7 @@
           <a-button type="primary" @click="addSchedule"> <plus-outlined />添加日程 </a-button>
         </div>
       </div>
-      <EditSchedule :editScheduleVisible="editScheduleVisible" :schedule="mySchedule" @changeVisible="changeVisible" />
+      <EditSchedule ref="editSchedule" :editScheduleVisible="editScheduleVisible" :schedule="mySchedule" @changeVisible="changeVisible" />
     </a-modal>
   </div>
 </template>
@@ -197,20 +197,54 @@
       };
 
       const tempSchedule = ref<any>();
+      const editSchedule = ref();
 
       // 展示编辑日程的模态框
       const showEditSchedule = (schedule) => {
-        tempSchedule.value = schedule.value;
-        schedule.value = [];
-        schedule.value = tempSchedule.value;
-        editScheduleVisible.value = true;
-        mySchedule.value = schedule;
-        console.log('editScheduleVisible.value', editScheduleVisible.value);
-        console.log('schedule.value', mySchedule.value.id);
+        let params = {
+          id: proId.value,
+        };
+        console.log('proId', params);
+        getProductList(params).then((res) => {
+          console.log('res===', res);
+          for (let i = 0; i < res.schedules.length; i++) {
+            openIndex.value.push(false);
+          }
+          productInfo.value = res;
+          schedules.value = res.schedules;
+
+          tempSchedule.value = schedule.value;
+          schedule.value = tempSchedule.value;
+          mySchedule.value = schedule;
+          visible.value = true;
+          editScheduleVisible.value = true;
+
+          console.log('editSchedule.value.form', editSchedule.value.form);
+          console.log('editScheduleVisible.value', editScheduleVisible.value);
+          console.log('schedule.value', mySchedule.value.id);
+        });
       };
 
-      const changeVisible = (value) => {
-        editScheduleVisible.value = value;
+      const changeVisible = (value, form) => {
+        // mySchedule.value = [];
+        let params = {
+          id: proId.value,
+        };
+        console.log('proId', params);
+        getProductList(params).then((res) => {
+          console.log('res===', res);
+          for (let i = 0; i < res.schedules.length; i++) {
+            openIndex.value.push(false);
+          }
+          productInfo.value = res;
+          schedules.value = res.schedules;
+          visible.value = true;
+
+          // tempSchedule.value = schedule.value;
+          // schedule.value = tempSchedule.value;
+          mySchedule.value = form;
+          editScheduleVisible.value = value;
+        });
       };
 
       // 是否展开
@@ -239,6 +273,7 @@
         cancelScheduleDelete,
         confirmScheduleDelete,
         schedules,
+        editSchedule,
         mySchedule,
         productInfo,
         tasks,
