@@ -2,7 +2,7 @@
   <div>
     <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加帮助中心问题</a-button>
     <a-button type="primary" danger style="width: 150px; margin: 5px 20px; float: right; margin-right: 10px" @click="commitSave">保存</a-button>
-    <a-alert style="width: 100%; text-align: center; font-weight: bold; font-size: 15px" message="修改后请记得保存或确认(一次只能添加一个)" type="warning" closable />
+    <a-alert style="width: 100%; text-align: center; font-weight: bold; font-size: 15px" message="修改后请记得保存或确认" type="warning" closable />
     <a-table :data-source="dataSource" :columns="columns" bordered :pagination="ipagination" @change="handleTableChange">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'questionTitle'">
