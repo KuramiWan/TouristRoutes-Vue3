@@ -193,7 +193,7 @@ let ipagination = ref();
 let pages = ref();
 const page = ref({
   pageNo: 1,
-  pageSize: 2,
+  pageSize: 10,
 });
 function getList() {
   getPageList(page.value).then((res) => {
