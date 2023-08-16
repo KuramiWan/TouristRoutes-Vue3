@@ -131,8 +131,8 @@
           <div>
             <!-- <div v-if="editableData10[record.key]"> -->
             <!-- <img style="width: 100%; height: 100%" :src="record[column.dataIndex]" /> -->
-            <a-upload v-model:file-list="addTourist.avatar" :customRequest="customRequest" list-type="picture-card" name="file">
-              <div v-if="addTourist.avatar.length < 1">
+            <a-upload v-model:file-list="record[column.dataIndex]" :customRequest="customRequest" list-type="picture-card" name="file">
+              <div v-if="record[column.dataIndex].length < 1">
                 <plus-outlined />
                 <div style="margin-top: 8px">Upload</div>
               </div>
@@ -166,6 +166,7 @@
   import { cloneDeep } from 'lodash-es';
   import { getPageList, DeleOff, AddOff, SavePageList } from './api';
   import { message, Modal } from 'ant-design-vue';
+  import { uploadOfficialImg } from './api';
 
   interface OffItem {
     id: string;
@@ -229,9 +230,15 @@
           locationCount: res.records[i].locationCount,
           views: res.records[i].views,
         };
+        item.img = [
+          {
+            url: item.img,
+          },
+        ];
         HelpList2.value.push(item);
       }
       dataSource.value = HelpList2.value;
+      console.log('dataSource.value', dataSource.value);
       pages.value = res.pages;
       allStra.value = res.total;
       var pagenation = {
@@ -251,6 +258,31 @@
   }
 
   getList();
+
+  function getBase64(file: File) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
+  // 自定义图片上传：返回值：url
+  const customRequest = async (e) => {
+    let base64Img = await getBase64(e.file);
+    let imgbase64 = base64Img.split(',')[1];
+    let data = {
+      base64Img: imgbase64,
+    };
+    uploadOfficialImg(data).then((res) => {
+      e.onProgress({ percent: 100 });
+      e.file.url = res[0];
+      e.onSuccess(res[0], e);
+      // fileList.value?.push([{}]);
+      console.log(res[0]);
+    });
+  };
 
   function getList2() {
     getPageList(page.value).then((res) => {
@@ -308,7 +340,8 @@
       title: '图片',
       dataIndex: 'img',
       ellipsis: true,
-      width: 100,
+      align: 'center',
+      width: 130,
     },
     {
       title: '标签',
@@ -417,6 +450,7 @@
 
   const edit10 = (key: string) => {
     editableData10[key] = cloneDeep(dataSource.value.filter((item) => key === item.key)[0]);
+    console.log('editableData10[key]', editableData10[key]);
   };
 
   const save = (key: string) => {
@@ -511,7 +545,7 @@
           id: newId,
           key: `${count.value}`,
           title: '',
-          img: '',
+          img: [],
           tag: '',
           locationAddress: '[]',
           locationTitle: '[]',
@@ -521,6 +555,7 @@
           locationCount: 0,
           views: 0,
         };
+
         dataSource.value.push(newOff);
         console.log(newId);
         // getList()
@@ -559,6 +594,9 @@
               locationCount: element.locationCount,
               views: element.views,
             };
+
+            offOne.img = offOne.img[0].url;
+            console.log('offOne.img', offOne.img);
 
             off1.value.push(offOne);
           });

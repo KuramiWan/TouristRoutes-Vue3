@@ -252,7 +252,7 @@
   import { DownOutlined, PlusOutlined } from '@ant-design/icons-vue';
   import { defineComponent, ref } from 'vue';
   import type { Ref } from 'vue';
-  import { listAllUnpaid, uploadGuideImg, addGuide, deleteGuideById, guideListByName } from './api/index';
+  import { getGuideList, uploadGuideImg, addGuide, deleteGuideById, guideListByName } from './api/index';
 
   function getBase64(file: File) {
     return new Promise((resolve, reject) => {
@@ -284,55 +284,55 @@
       // ---------------------------------------------table查看数据-----------------------------------------------------------
       const columns = ref<TableColumnsType>([
         {
-          title: '未付款订单id',
-          width: 150,
-          dataIndex: 'id',
+          title: '头像',
+          width: 100,
+          dataIndex: 'avatar',
           fixed: 'left',
           ellipsis: true,
           align: 'center',
         },
         {
-          title: '用户名',
+          title: '姓名',
           width: 150,
-          dataIndex: 'username',
+          dataIndex: 'name',
           fixed: 'left',
           align: 'center',
         },
         {
-          title: '用户唯一标识',
+          title: '年龄',
           width: 100,
-          dataIndex: 'openid',
+          dataIndex: 'age',
           align: 'center',
         },
         {
-          title: '用户头像',
-          dataIndex: 'avatar',
-          width: 100,
-          align: 'center',
-        },
-        {
-          title: '用户手机号',
-          dataIndex: 'phone',
+          title: '性别',
+          dataIndex: 'sex',
           width: 100,
           align: 'center',
         },
         {
-          title: '联系人姓名',
-          dataIndex: 'contactName',
+          title: '祖籍',
+          dataIndex: 'descent',
           width: 100,
           align: 'center',
         },
         {
-          title: '联系人手机号',
-          dataIndex: 'contactPhone',
+          title: '从业年限',
+          dataIndex: 'employmentTime',
+          width: 100,
+          align: 'center',
+        },
+        {
+          title: '瀑布摘要',
+          dataIndex: 'summary',
           width: 350,
           ellipsis: true,
           align: 'center',
         },
         {
-          title: '出行人',
-          dataIndex: 'travelers',
-          key: 'travelers',
+          title: '擅长景点',
+          dataIndex: 'greatSpots',
+          key: 'greatSpots',
           width: 250,
           align: 'center',
         },
@@ -372,67 +372,28 @@
 
       interface DataItem {
         id: string;
-        createTime: string;
-        product: {
-          proTitle: string;
-          proPageImg: string;
-          posters: string;
-          proInctroduction: string;
-          proType: number;
-          origin: string;
-          proDate: number;
-          local: string;
-          localDetail: string;
-          recNum: number;
-        };
-        dateStarted: string;
-        dateClosed: string;
-        journeyPackage: {
-          jpContent: string;
-          jpPriceAdult: number;
-          jpPriceChild: number;
-        };
-        touristGuide: {
-          id: string;
-          name: string;
-          age: string;
-          sex: string;
-          descent: string;
-          employmentTime: string;
-          summary: string;
-          greatSpots: string;
-          avatar: string;
-          honor: string;
-        };
-        userinfo: {
-          openid: string;
-          username: string;
-          avatar: string;
-          phone: string;
-          // signature:string
-        };
-        contactName: string;
-        contactPhone: string;
-        travelers: [];
-        adultCount: number;
-        childrenCount: number;
-        payingMoney: number;
-        coupon: number;
-        insures: [];
-        note: string;
-        youxiabi: number;
-        status: number;
+        name: string;
+        age: string;
+        sex: string;
+        descent: string;
+        employmentTime: string;
+        summary: string;
+        greatSpots: [];
+        introduction: string;
+        qualifications: string;
+        honor: string;
+        likeNum: string;
       }
 
       let data: Ref<DataItem[]> = ref([]);
 
-      const getAllOrdersUnpaidList = async () => {
+      const getAllGuideList = async () => {
         loading.value = true;
         let params = {
           pageNo: current.value,
           pageSize: pageSize.value,
         };
-        const res = await listAllUnpaid(params);
+        const res = await getGuideList(params);
         console.log('res==', res);
         data.value = res.records;
         pageTotal.value = res.total;
@@ -442,66 +403,182 @@
         console.log('data.value==', data.value);
         loading.value = false;
       };
-      getAllOrdersUnpaidList();
+      getAllGuideList();
 
       // ---------------------------------------------新增导游数据-----------------------------------------------------------
+      // 新增导游对象
+      const addTourist = ref<any>({
+        name: '',
+        age: '',
+        sex: '',
+        avatar: [],
+        descent: '',
+        employmentTime: '',
+        summary: '',
+        greatSpots: '',
+        introduction: '',
+        qualifications: '',
+        honor: '',
+      });
+
+      const addVisible = ref<boolean>(false);
+
+      const showAddModal = () => {
+        // 重置添加对象为空
+        addTourist.value = {
+          name: '',
+          age: '',
+          sex: '',
+          avatar: [],
+          descent: '',
+          employmentTime: '',
+          summary: '',
+          greatSpots: '',
+          introduction: '',
+          qualifications: '',
+          honor: '',
+        };
+        addVisible.value = true;
+      };
+
+      // 判断新增导游对象是否为空
+      function checkObjectProperties(obj) {
+        for (let key in obj) {
+          if (obj[key] === '' || (Array.isArray(obj[key]) && obj[key].length === 0)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // 点击确定新增or编辑导游
+      const handleOkAdd = async () => {
+        let data = { ...addTourist.value };
+        // 有字段为空不允许添加
+        if (!checkObjectProperties(addTourist.value)) {
+          message.warning('请补充完整导游信息');
+          return;
+        }
+
+        // 把擅长景点改为以空格分隔的数组
+        console.log('addTourist.value.greatSpots.split()', addTourist.value.greatSpots.split(' '));
+        data.greatSpots = addTourist.value.greatSpots.split(' ');
+        // 改变导游对象的avatar属性的值
+        data.avatar = addTourist.value.avatar[0].url;
+        // 改变从业年限
+        data.employmentTime = data.employmentTime + '年';
+        // 调用添加接口
+        await addGuide(data);
+        getAllGuideList();
+        // 关闭对话框
+        addVisible.value = false;
+      };
+
+      const previewVisible = ref(false);
+      const previewImage = ref('');
+      const previewTitle = ref('');
+
+      const handleCancel = () => {
+        previewVisible.value = false;
+        previewTitle.value = '';
+      };
+
+      // 自定义图片上传：返回值：url
+      const customRequest = async (e) => {
+        let base64Img = await getBase64(e.file);
+        let imgbase64 = base64Img.split(',')[1];
+        let data = {
+          base64Img: imgbase64,
+        };
+        uploadGuideImg(data).then((res) => {
+          e.onProgress({ percent: 100 });
+          e.file.url = res[0];
+          e.onSuccess(res[0], e);
+          // fileList.value?.push([{}]);
+          console.log(res[0]);
+        });
+      };
 
       // ---------------------------------------------删除导游数据-----------------------------------------------------------
-      // const deleteGuide = async (id) => {
-      //   await deleteGuideById({ id });
-      //   getAllGuideList();
-      // };
+      const deleteGuide = async (id) => {
+        await deleteGuideById({ id });
+        getAllGuideList();
+      };
 
       // ---------------------------------------------编辑导游数据-----------------------------------------------------------
+      let tempAvatar = [];
+      let greatSpots = '';
+      const showEditGuide = async (record) => {
+        addTourist.value = { ...record };
+        // 转换avatar
+        tempAvatar = [];
+        tempAvatar.push({
+          url: record.avatar,
+        });
+        addTourist.value.avatar = tempAvatar;
+        // 转化greatSpots
+        greatSpots = '';
+        record.greatSpots.forEach((i, index) => {
+          if (index === 0) {
+            greatSpots = i;
+          } else {
+            greatSpots = greatSpots + ' ' + i;
+          }
+        });
+        addTourist.value.greatSpots = greatSpots;
+        // 转化从业年限
+        addTourist.value.employmentTime = record.employmentTime.split('年')[0];
+        addVisible.value = true;
+      };
 
       // ---------------------------------------------查看导游详情-----------------------------------------------------------
-      // const detailVisible = ref(false);
+      const detailVisible = ref(false);
 
-      // function showDetailModal(record) {
-      //   addTourist.value = { ...record };
-      //   // 转换avatar
-      //   tempAvatar = [];
-      //   tempAvatar.push({
-      //     url: record.avatar,
-      //   });
-      //   addTourist.value.avatar = tempAvatar;
-      //   // 转化greatSpots
-      //   greatSpots = '';
-      //   record.greatSpots.forEach((i, index) => {
-      //     if (index === 0) {
-      //       greatSpots = i;
-      //     } else {
-      //       greatSpots = greatSpots + ' ' + i;
-      //     }
-      //   });
-      //   addTourist.value.greatSpots = greatSpots;
-      //   // 转化从业年限
-      //   addTourist.value.employmentTime = record.employmentTime.split('年')[0];
-      //   detailVisible.value = true;
-      // }
+      function showDetailModal(record) {
+        addTourist.value = { ...record };
+        // 转换avatar
+        tempAvatar = [];
+        tempAvatar.push({
+          url: record.avatar,
+        });
+        addTourist.value.avatar = tempAvatar;
+        // 转化greatSpots
+        greatSpots = '';
+        record.greatSpots.forEach((i, index) => {
+          if (index === 0) {
+            greatSpots = i;
+          } else {
+            greatSpots = greatSpots + ' ' + i;
+          }
+        });
+        addTourist.value.greatSpots = greatSpots;
+        // 转化从业年限
+        addTourist.value.employmentTime = record.employmentTime.split('年')[0];
+        detailVisible.value = true;
+      }
 
-      // function cancelDetailModal() {
-      //   detailVisible.value = false;
-      // }
+      function cancelDetailModal() {
+        detailVisible.value = false;
+      }
 
       // ---------------------------------------------根据名字模糊搜索-----------------------------------------------------------
-      // const searchName = ref(null);
-      // const onSearchByName = async () => {
-      //   loading.value = true;
-      //   console.log(searchName.value);
-      //   let res = undefined;
-      //   if (searchName.value === null) {
-      //     res = await getGuideList({ name: searchName.value });
-      //   } else {
-      //     res = await guideListByName({ name: searchName.value });
-      //   }
-      //   data.value = res.records;
-      //   pageTotal.value = res.total;
-      //   pageSize.value = res.size;
-      //   // 搜索完一次置空
-      //   searchName.value = null;
-      //   loading.value = false;
-      // };
+      const searchName = ref(null);
+      const onSearchByName = async () => {
+        loading.value = true;
+        console.log(searchName.value);
+        let res = undefined;
+        if (searchName.value === null) {
+          res = await getGuideList({ name: searchName.value });
+        } else {
+          res = await guideListByName({ name: searchName.value });
+        }
+        data.value = res.records;
+        pageTotal.value = res.total;
+        pageSize.value = res.size;
+        // 搜索完一次置空
+        searchName.value = null;
+        loading.value = false;
+      };
 
       return {
         data,
@@ -510,27 +587,27 @@
         pageSize,
         pageTotal,
         fixedTop: ref(false),
-        // addVisible,
-        // addTourist,
-        // previewVisible,
-        // previewImage,
-        // previewTitle,
-        // detailVisible,
-        // searchName,
+        addVisible,
+        addTourist,
+        previewVisible,
+        previewImage,
+        previewTitle,
+        detailVisible,
+        searchName,
         loading,
-        // getGuideList,
-        // getAllGuideList,
-        // onSearchByName,
+        getGuideList,
+        getAllGuideList,
+        onSearchByName,
         changePage,
-        // showAddModal,
-        // handleOkAdd,
+        showAddModal,
+        handleOkAdd,
         getBase64,
-        // handleCancel,
-        // customRequest,
-        // showEditGuide,
-        // deleteGuide,
-        // showDetailModal,
-        // cancelDetailModal,
+        handleCancel,
+        customRequest,
+        showEditGuide,
+        deleteGuide,
+        showDetailModal,
+        cancelDetailModal,
       };
     },
   });
