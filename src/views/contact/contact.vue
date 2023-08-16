@@ -3,7 +3,7 @@
     <a-card>
       <a-page-header style="border: 1px solid rgb(235, 237, 240)" title="修改后记得保存" />
       <br />
-      联系电话:<a-input placeholder="请输入联系电话" v-model:value="phone"></a-input>
+      联系邮箱:<a-input placeholder="请输入联系邮箱" v-model:value="phone"></a-input>
       <br />
       联系地址:<a-textarea placeholder="请输入联系地址" v-model:value="address"></a-textarea>
       <br />

@@ -105,6 +105,10 @@
                       <a-button type="text" @click="showChargeModal">费用说明</a-button>
                       <Charge :proId="record.id" ref="showCharge"></Charge>
                     </a-menu-item>
+                    <a-menu-item>
+                      <a-button type="text" @click="showServiceModal">配置客服</a-button>
+                      <ProductService :proId="record.id" ref="showService"></ProductService>
+                    </a-menu-item>
                   </a-menu>
                 </template>
               </a-dropdown>
@@ -234,6 +238,7 @@
   import Tag from '../tag/tag.vue';
   import Charge from '../charge/charge.vue';
   import Insure from '../insure/insure.vue';
+  import ProductService from '../productService/productService.vue';
 
   /**---------------------------------------请求的产品数据--------------------------------------------------**/
   // 请求返回的数据，等待请求之后完成封装
@@ -693,6 +698,12 @@
   const showChargeModal = () => {
     showCharge.value.showModal();
   };
+
+  const showService = ref();
+  const showServiceModal = () => {
+    showService.value.showModal();
+  };
+  
 
   /**---------------------------------------调用保险组件--------------------------------------------------**/
 
