@@ -237,7 +237,6 @@
         ];
         HelpList2.value.push(item);
       }
-      dataSource.value = HelpList2.value;
       console.log('dataSource.value', dataSource.value);
       pages.value = res.pages;
       allStra.value = res.total;
@@ -253,6 +252,7 @@
         showQuickJumper: true, //是否可以快速跳转至某页
         showSizeChanger: true, //是否可以改变pageSize
       };
+      dataSource.value = HelpList2.value;
       ipagination.value = pagenation;
     });
   }
@@ -325,7 +325,7 @@
     ipagination.value = pagination;
     allStra.value = pagination.total;
     // console.log(pagination);
-    getList2();
+    getList();
     console.log(dataSource.value);
   };
 
@@ -516,6 +516,10 @@
     dataSource.value = dataSource.value.filter((item) => item.key !== key);
     dataSource.value.length - 1;
     console.log(dataSource.value);
+    // if(dataSource.value.length == 0){
+    //   page.value.pageNo = page.value.pageNo - 1
+    // }
+    // getList()
   };
 
   const handleAdd = () => {
@@ -558,7 +562,7 @@
 
         dataSource.value.push(newOff);
         console.log(newId);
-        // getList()
+        getList()
         // getList2();
       });
       // getList2()

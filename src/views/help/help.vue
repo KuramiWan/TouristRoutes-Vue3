@@ -63,7 +63,6 @@
     answer: string;
   }
 
-  const HelpList: Ref<HelpItem[]> = ref([]);
   let counter = 0;
   let allStra = ref();
   let ipagination = ref();
@@ -73,6 +72,7 @@
     pageSize: 10,
   });
   function getList() {
+  const HelpList: Ref<HelpItem[]> = ref([]);
     getPageList(page.value).then((res) => {
       for (let i = 0; i < res.records.length; i++) {
         const item: HelpItem = {
@@ -97,22 +97,14 @@
         showQuickJumper: true, //是否可以快速跳转至某页
         showSizeChanger: true, //是否可以改变pageSize
       };
+      dataSource.value  = HelpList.value
       ipagination.value = pagenation;
     });
   }
 
   getList();
 
-  function getList2() {
-    getPageList(page.value).then((res) => {
-      dataSource.value = res.records;
-      pages.value = res.pages;
-      // debugger
-      dataSource.value.forEach((item) => {
-        item.key = (counter++).toString();
-      });
-    });
-  }
+
 
   const handleTableChange = function (pagination, filters, sorter) {
     // console.log(allStra)
@@ -122,7 +114,7 @@
     ipagination.value = pagination;
     allStra.value = pagination.total;
     console.log(pagination);
-    getList2();
+    getList();
     console.log(dataSource.value);
   };
 
@@ -143,7 +135,7 @@
     },
   ];
 
-  const dataSource: Ref<HelpItem[]> = HelpList;
+  const dataSource: Ref<HelpItem[]> = ref([]);
   const editableData: UnwrapRef<Record<string, HelpItem>> = reactive({});
   const editableData2: UnwrapRef<Record<string, HelpItem>> = reactive({});
 
@@ -216,8 +208,8 @@
         };
         dataSource.value.push(newData);
         console.log(newId);
-        // getList()
-        getList2();
+        getList()
+        // getList2();
       });
       // getList2()
     } else {
@@ -237,6 +229,11 @@
     });
     dataSource.value = dataSource.value.filter((item) => item.key !== key);
     dataSource.value.length - 1;
+    console.log(dataSource.value.length)
+    if(dataSource.value.length == 0){
+      page.value.pageNo = page.value.pageNo - 1
+    }
+    getList()
     // console.log(dataSource.value);
   };
 </script>
