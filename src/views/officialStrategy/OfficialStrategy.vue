@@ -1,13 +1,13 @@
 <template>
   <div>
-    <a-button type="primary" style="margin: 5px 5px" @click="handleAdd">添加官方攻略</a-button>
+    <a-button type="primary" style="margin: 5px 5px" @click="showAddModal">添加官方攻略</a-button>
     <a-button type="primary" danger style="width: 150px; margin: 5px 20px; float: right; margin-right: 10px" @click="commitSave">保存</a-button>
-    <a-alert
+    <!-- <a-alert
       style="width: 100%; text-align: center; font-weight: bold; font-size: 15px"
       message="修改后请记得保存或确认(有[]得写在里面)"
       type="warning"
       closable
-    />
+    /> -->
     <a-table :data-source="dataSource" :columns="columns" bordered :pagination="ipagination" @change="handleTableChange">
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'title'">
@@ -156,6 +156,90 @@
         </template>
       </template>
     </a-table>
+    <a-modal width="50%" v-model:visible="addVisible" title="添加官方攻略" @ok="handleOkAdd">
+        <div class="add-tourist">
+          <a-form name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="标题" name="title">
+                  <a-input v-model:value="addOfficialStrategy.title" placeholder="请输入标题" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="图片" name="img">
+                  <a-upload v-model:file-list="addOfficialStrategy.img" :customRequest="customRequest" list-type="picture-card" name="file" maxCount="1">
+                    <div v-if="addOfficialStrategy.img.length <1">
+                      <plus-outlined />
+                      <div style="margin-top: 8px">Upload</div>
+                    </div>
+                  </a-upload>
+                  <a-modal :visible="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
+                    <img alt="example" style="width: 100%" :src="previewImage" />
+                  </a-modal>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="标签" name="tag">
+                  <a-input v-model:value="addOfficialStrategy.tag" placeholder="请输入标签" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="观光地址" name="locationAddress">
+                  <a-input v-model:value="addOfficialStrategy.locationAddress" placeholder="请输入观光地址,多个地址请用,分隔" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="观光标题" name="locationTitle">
+                  <a-input v-model:value="addOfficialStrategy.locationTitle" placeholder="请输入观光标题,多个标题请用,分隔" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="观光点描述" name="locationDesc">
+                  <a-textarea v-model:value="addOfficialStrategy.locationDesc" show-count :maxlength="150" placeholder="请输入观光点描述,多个描述请用,分隔" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="观光点推荐游玩小时数" name="locationHour">
+                  <a-input v-model:value="addOfficialStrategy.locationHour" placeholder="请输入观光点推荐游玩小时数,多个数据请用,分隔" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="游玩天数" name="days">
+                  <a-input-number v-model:value="addOfficialStrategy.days" :min="0" :max="100" style="width: 96%" placeholder="请输入游玩天数" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="观光点个数" name="locationCount">
+                  <a-input-number v-model:value="addOfficialStrategy.locationCount" :min="0" :max="100" style="width: 96%" placeholder="请输入观光点个数" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="浏览数" name="views">
+                  <a-input v-model:value="addOfficialStrategy.views" placeholder="请输入浏览数" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </div>
+      </a-modal>
   </div>
 </template>
 
@@ -205,14 +289,74 @@
     pageNo: 1,
     pageSize: 10,
   });
+  // ---------------------------------------------新增攻略数据-----------------------------------------------------------
+      // 新增攻略对象
+      const addOfficialStrategy = ref<any>({
+        title: '',
+        img: [],
+        tag: '',
+        locationAddress: '',
+        locationTitle: '',
+        locationDesc: '',
+        days: null,
+        locationHour: '',
+        locationCount: null,
+        views: null
+      });
+
+      const addVisible = ref<boolean>(false);
+
+      const showAddModal = () => {
+        // 重置添加对象为空
+        addOfficialStrategy.value = Object.assign({}, {
+          title: '',
+          img: [],
+          tag: '',
+          locationAddress: '',
+          locationTitle: '',
+          locationDesc: '',
+          days: null,
+          locationHour: '',
+          locationCount: null,
+          views: null
+        });
+        console.log(addOfficialStrategy.value);
+        addVisible.value = true;
+      };
+        // 判断新增导游对象是否为空
+        function checkObjectProperties(obj) {
+        for (let title in obj) {
+          if (obj[title] === '' || (Array.isArray(obj[title]) && obj[title].length === 0)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // 点击确定新增or编辑导游
+      const handleOkAdd = async () => {
+        let data = { ...addOfficialStrategy.value };
+        data.img = data.img.join(',');
+        console.log('信息',addOfficialStrategy.value);
+        // 有字段为空不允许添加
+        if (!(addOfficialStrategy.value.title)) {
+          message.warning('请补充完整导游信息');
+          return;
+        }
+        // 调用添加接口
+        await handleAdd(data);
+        getList();
+        // 关闭对话框
+        addVisible.value = false;
+      };
   function getList() {
     getPageList(page.value).then((res) => {
       const HelpList2: Ref<OffItem[]> = ref([]);
       for (let i = 0; i < res.records.length; i++) {
-        let item1 = JSON.stringify(res.records[i].locationAddress);
-        let item2 = JSON.stringify(res.records[i].locationTitle);
-        let item3 = JSON.stringify(res.records[i].locationDesc);
-        let item4 = JSON.stringify(res.records[i].locationHour);
+        let item1 = res.records[i].locationAddress.join(', ');
+        let item2 = res.records[i].locationTitle.join(', ');
+        let item3 = res.records[i].locationDesc.join(', ');
+        let item4 = res.records[i].locationHour.join(', ');
         // let item2 = JSON.parse(item1)locationHour
         // console.log(res.records[i].locationAddress);
         // console.log(item2)
@@ -261,9 +405,13 @@
 
   function getBase64(file: File) {
     return new Promise((resolve, reject) => {
+      // 创建一个文件读取器
       const reader = new FileReader();
+      // 读取文件
       reader.readAsDataURL(file);
+      // 当读取完成时，调用resolve函数
       reader.onload = () => resolve(reader.result);
+      // 当读取失败时，调用reject函数
       reader.onerror = (error) => reject(error);
     });
   }
@@ -286,15 +434,22 @@
 
   function getList2() {
     getPageList(page.value).then((res) => {
+      // 创建一个Ref<OffItem[]>类型的变量HelpList2
       const HelpList2: Ref<OffItem[]> = ref([]);
+      // 遍历res.records数组
       for (let i = 0; i < res.records.length; i++) {
+        // 将res.records[i].locationAddress转换为字符串
         let item1 = JSON.stringify(res.records[i].locationAddress);
+        // 将res.records[i].locationTitle转换为字符串
         let item2 = JSON.stringify(res.records[i].locationTitle);
+        // 将res.records[i].locationDesc转换为字符串
         let item3 = JSON.stringify(res.records[i].locationDesc);
+        // 将res.records[i].locationHour转换为字符串
         let item4 = JSON.stringify(res.records[i].locationHour);
         // let item2 = JSON.parse(item1)locationHour
         // console.log(res.records[i].locationAddress);
         // console.log(item2)
+        // 将item1,item2,item3,item4转换为OffItem类型
         const item: OffItem = {
           id: res.records[i].id,
           key: i.toString(),
@@ -309,9 +464,12 @@
           locationCount: res.records[i].locationCount,
           views: res.records[i].views,
         };
+        // 将item添加到HelpList2中
         HelpList2.value.push(item);
       }
+      // 将HelpList2赋值给dataSource.value
       dataSource.value = HelpList2.value;
+      // 将res.pages赋值给pages.value
       pages.value = res.pages;
       // debugger
     });
@@ -522,26 +680,27 @@
     // getList()
   };
 
-  const handleAdd = () => {
-    let item1 = JSON.parse('[]');
-    let item2 = JSON.parse('[]');
-    let item3 = JSON.parse('[]');
-    let item4 = JSON.parse('[]');
+  const handleAdd = (data) => {
+    addVisible.value = false;
+    console.log('locationTitle',data.locationTitle);
+    let item1 = JSON.stringify(data.locationAddress).split(',').map((item) => item.replace(/['"]+/g, ''));
+    let item2 = JSON.stringify(data.locationTitle).split(',').map((item) => item.replace(/['"]+/g, ''));
+    let item3 = JSON.stringify(data.locationDesc).split(',').map((item) => item.replace(/['"]+/g, ''));
+    let item4 = JSON.stringify(data.locationHour).split(',').map((item) => item.replace(/['"]+/g, ''));
     const off2 = {
-      title: '',
-      img: '',
-      tag: '',
+      title: data.title,
+      img: data.img,
+      tag: data.tag,
       locationAddress: item1,
       locationTitle: item2,
       locationDesc: item3,
-      days: 0,
+      days: data.days,
       locationHour: item4,
-      locationCount: 0,
-      views: 0,
+      locationCount: data.locationCount,
+      views: data.views,
     };
-    console.log(ipagination.value);
-    if (ipagination.value.current == pages.value) {
       var newId: string;
+      console.log('off2',off2);
       AddOff(off2).then((res) => {
         // console.log(res);
         newId = res;
@@ -549,7 +708,7 @@
           id: newId,
           key: `${count.value}`,
           title: '',
-          img: [],
+          img: '',
           tag: '',
           locationAddress: '[]',
           locationTitle: '[]',
@@ -559,16 +718,12 @@
           locationCount: 0,
           views: 0,
         };
-
         dataSource.value.push(newOff);
         console.log(newId);
         getList()
         // getList2();
       });
       // getList2()
-    } else {
-      message.error('请到最后一页添加');
-    }
   };
 
   const commitSave = () => {
@@ -579,11 +734,12 @@
       content: '保存修改的所有内容',
       onOk() {
         return new Promise((resolve, reject) => {
+          // 获取数据
           dataSource.value.forEach((element) => {
-            let item1 = JSON.parse(element.locationAddress);
-            let item2 = JSON.parse(element.locationTitle);
-            let item3 = JSON.parse(element.locationDesc);
-            let item4 = JSON.parse(element.locationHour);
+            let item1 = JSON.stringify(element.locationAddress).split(', ').map((item) => item.replace(/['"]+/g, ''));
+            let item2 = JSON.stringify(element.locationTitle).split(', ').map((item) => item.replace(/['"]+/g, ''));
+            let item3 = JSON.stringify(element.locationDesc).split(', ').map((item) => item.replace(/['"]+/g, ''));
+            let item4 = JSON.stringify(element.locationHour).split(', ').map((item) => item.replace(/['"]+/g, ''));
 
             const offOne = {
               id: element.id,
@@ -599,17 +755,18 @@
               views: element.views,
             };
 
+            // 将数据添加到off1中
             offOne.img = offOne.img[0].url;
             console.log('offOne.img', offOne.img);
 
             off1.value.push(offOne);
           });
-          // console.log(help.value);
+          console.log(off1.value);
           SavePageList(off1.value).then(() => {
             // getList2();
           });
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('错误'));
+          setTimeout(Math.random() > 0.5? resolve : reject, 1000);
+        }).catch((err) => console.log('错误',err));
       },
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       onCancel() {
@@ -630,3 +787,4 @@
     height: auto;
   }
 </style>
+
