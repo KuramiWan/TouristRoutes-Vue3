@@ -1,19 +1,19 @@
 import { defHttp } from '/@/utils/http/axios';
 
 enum Api {
-  Strategy = 'strategy/friendStrategy/queryById',
-  DeleteStrategy = 'strategy/friendStrategy/delete',
-  AddStrategy = 'strategy/friendStrategy/add',
-  updateStrategy = 'strategy/friendStrategy/edit',
-  List = 'strategy/friendStrategy/list',
+  Strategy = '/strategy/friendStrategy/queryById',
+  DeleteStrategy = '/strategy/friendStrategy/delete',
+  AddStrategy = '/strategy/friendStrategy/add',
+  updateStrategy = '/strategy/friendStrategy/edit',
+  List = '/strategy/friendStrategy/list',
 }
 
 export function getFriendStrategy(params: { proId: string }) {
   return defHttp.get({ url: Api.Strategy, params });
 }
 
-export function deleteFriendStrategy(params: { id: string }) {
-  return defHttp.delete({ url: Api.DeleteStrategy, params });
+export function deleteFriendStrategy(params) {
+  return defHttp.delete({ url: Api.DeleteStrategy, data:params },{ joinParamsToUrl: true });
 }
 
 export function getFriendStrategyList(params) {

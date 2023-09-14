@@ -205,7 +205,7 @@
             <a-row :gutter="24">
               <a-col :span="24">
                 <a-form-item label="观光点描述" name="locationDesc">
-                  <a-textarea v-model:value="addOfficialStrategy.locationDesc" show-count :maxlength="150" placeholder="请输入观光点描述,多个描述请用,分隔" />
+                  <a-textarea v-model:value="addOfficialStrategy.locationDesc" show-count :maxlength="1000" placeholder="请输入观光点描述,多个描述请用,分隔" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -323,16 +323,6 @@
         console.log(addOfficialStrategy.value);
         addVisible.value = true;
       };
-        // 判断新增导游对象是否为空
-        function checkObjectProperties(obj) {
-        for (let title in obj) {
-          if (obj[title] === '' || (Array.isArray(obj[title]) && obj[title].length === 0)) {
-            return false;
-          }
-        }
-        return true;
-      }
-
       // 点击确定新增or编辑导游
       const handleOkAdd = async () => {
         let data = { ...addOfficialStrategy.value };

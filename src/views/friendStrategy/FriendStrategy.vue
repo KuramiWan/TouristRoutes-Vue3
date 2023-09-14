@@ -1,5 +1,5 @@
 <template>
-  <a-button class="editable-add-btn" type="primary" style="margin-bottom: 8px" @click="handleAdd">Add</a-button>
+  <!-- <a-button class="editable-add-btn" type="primary" style="margin-bottom: 8px" @click="showAddModal">Add</a-button> -->
   <a-table :columns="columns" :data-source="dataSource" bordered :pagination="ipagination" @change="handleTableChange">
     <template #bodyCell="{ column, text, record }">
       <template v-if="['title', 'content', 'forwardCount', 'img', 'likeCount', 'userid'].includes(column.dataIndex)">
@@ -28,12 +28,66 @@
       </template>
     </template>
   </a-table>
+  <a-modal width="50%" v-model:visible="addVisible" title="添加官方攻略" @ok="handleOkAdd">
+        <div class="add-tourist">
+          <a-form name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="标题" name="title">
+                  <a-input v-model:value="addOfficialStrategy.title" placeholder="请输入标题" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="图片" name="img">
+                  <a-upload v-model:file-list="addOfficialStrategy.img" :customRequest="customRequest" list-type="picture-card" name="file" maxCount="1">
+                    <div v-if="addOfficialStrategy.img.length <3">
+                      <plus-outlined />
+                      <div style="margin-top: 8px">Upload</div>
+                    </div>
+                  </a-upload>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="内容" name="content">
+                  <a-input v-model:value="addOfficialStrategy.content" placeholder="请输入内容" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="转发数" name="forwardCount">
+                  <a-input-number v-model:value="addOfficialStrategy.forwardCount" :min="0" :max="1000" style="width: 96%" placeholder="请输入转发数" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="点赞数" name="likeCount">
+                  <a-input-number v-model:value="addOfficialStrategy.likeCount" :min="0" :max="1000" style="width: 96%" placeholder="请输入点赞数" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="24">
+              <a-col :span="24">
+                <a-form-item label="发布位置" name="position">
+                  <a-input v-model:value="addOfficialStrategy.position" placeholder="请输入发布位置" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </div>
+      </a-modal>
 </template>
 <script lang="ts" setup>
 import { cloneDeep } from 'lodash-es';
 import { reactive, ref } from 'vue';
 import type { UnwrapRef } from 'vue';
 import { getFriendStrategyList, updateFriendStrategy, deleteFriendStrategy, addFriendStrategy } from './friendStrategyApi';
+import { message, Modal } from 'ant-design-vue';
 
 const columns = [
   {
@@ -104,6 +158,52 @@ const page = {
   pageNo: 1,
   pageSize: 10,
 };
+  // ---------------------------------------------新增攻略数据-----------------------------------------------------------
+        // 新增攻略对象
+        const addOfficialStrategy = ref<any>({
+          key: '',
+          title: '',
+          content: '',
+          forwardCount: '',
+          userid: '',
+          img: [],
+          likeCount: '',
+          position:''
+        });
+
+        const addVisible = ref<boolean>(false);
+
+        const showAddModal = () => {
+          // 重置添加对象为空
+          addOfficialStrategy.value = Object.assign({}, {
+            key: '',
+            title: '',
+            content: '',
+            forwardCount: '',
+            userid: '',
+            img: [],
+            likeCount: '',
+            position:''
+          });
+          console.log(addOfficialStrategy.value);
+          addVisible.value = true;
+        };
+        // 点击确定新增or编辑导游
+        const handleOkAdd = async () => {
+          let data = { ...addOfficialStrategy.value };
+          data.img = JSON.parse(JSON.stringify(data.img));
+          console.log('信息',addOfficialStrategy.value);
+          // 有字段为空不允许添加
+          if (!(addOfficialStrategy.value.title)) {
+            message.warning('请补充完整攻略信息');
+            return;
+          }
+          // 调用添加接口
+          await handleAdd(data);
+          getList();
+          // 关闭对话框
+          addVisible.value = false;
+        };
 function getList() {
   getFriendStrategyList(page).then((res) => {
     dataSource.value = res.records;
@@ -125,6 +225,7 @@ function getList() {
     dataSource.value.forEach((item) => {
       item.key = (counter++).toString();
     });
+    console.log('dataSource.value',dataSource.value);
   });
 }
 function getList2() {
@@ -169,25 +270,20 @@ const cancel = (key: string) => {
 };
 
 const onDelete = (key: string) => {
-  dataSource.value = dataSource.value.filter((item) => item.key !== key);
-  deleteFriendStrategy(dataSource[key].id);
+  console.log(dataSource.value[key].id);
+  deleteFriendStrategy({
+    id: dataSource.value[key].id,
+  });
+  getList();
 };
 
-const handleAdd = () => {
-  const newData = {
-    key: `${++counter}`,
-    title: '',
-    content: '',
-    forwardCount: '',
-    userid: '',
-    img: '',
-    likeCount: '',
-  };
-  dataSource.value.push(newData);
+const handleAdd = (data) => {
+  console.log('data',data);
   // editableData[counter] = newData;
-  addFriendStrategy(dataSource[counter]).then((res) => {
+  addFriendStrategy(data).then((res) => {
     console.log(res);
   });
+  getList();
 };
 
 // const columns = [
