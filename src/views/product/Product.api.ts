@@ -8,14 +8,19 @@ enum Api {
   saveOrUpdate = '/core/product/temporarySaveOrUpdate',
   deleteOne = '/core/product/delete',
   uploadImg = '/core/product/temporaryUploadImg',
+  list = '/com.sxy.travel/travelAgency/list',
 }
-
+/**
+ * 列表接口
+ * @param params
+ */
+export const list = (params) =>
+  defHttp.get({url: Api.list, params});
 /**
  * 产品列表接口
  * @param params
  */
 export const getProductList = (params) => defHttp.get({ url: Api.getProductList, params });
-
 /**
  * 保存或者更新
  * @param data

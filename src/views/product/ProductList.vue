@@ -9,6 +9,9 @@
           <template v-if="column.dataIndex === 'proType'">
             <span>{{ record.proType == 1 ? '景点' : '线路' }}</span>
           </template>
+          <template v-if="column.dataIndex === 'travelAgency'">
+            <span>{{record.travelAgency}}</span>
+          </template>
           <!-- 操作单元格 -->
           <template v-if="column.dataIndex === 'operation'">
             <a-space>
@@ -148,6 +151,11 @@
                     <a-select-option value="2">线路</a-select-option>
                   </a-select>
                 </template>
+                <template v-else-if="column.dataIndex === 'travelAgency'">
+                  <a-select ref="selectType" v-model:value="formState.travelId" placeholder="请选择旅行社" >
+                    <a-select-option v-for ='item in travelAgency' :key="index" :value = "item.id">{{ item.organization }}</a-select-option>
+                  </a-select>
+                </template>
                 <!-- 如果是产品封面，那么采用图片模态框，渲染加上传 -->
                 <template v-else-if="column.dataIndex === 'proPageImg'">
                   <div class="clearfix">
@@ -227,7 +235,7 @@
   import { ref, computed, reactive, onMounted, defineProps, getCurrentInstance } from 'vue';
   import { DownOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import { message } from 'ant-design-vue';
-  import { getProductList, saveOrUpdate, deleteOne, uploadImg } from './Product.api';
+  import { getProductList, saveOrUpdate, deleteOne, uploadImg,list } from './Product.api';
   import { Modal } from 'ant-design-vue';
   import { createVNode } from 'vue';
   import DatePrice from '../datePrice/datePrice.vue';
@@ -251,10 +259,16 @@
   let total = ref(null);
   let open2 = ref([]);
   let open = ref([]);
+  let travelAgency
   // 调用接口，查询产品列表
   const listPro = async (current) => {
     try {
       const response = await getProductList({ pageNo: current, pageSize: 10 });
+      const res = await list();
+      if (!travelAgency){
+        travelAgency=res.records 
+        console.log('res',travelAgency);
+      } 
       // response.records是所有信息，根据这个筛选
       console.log(response);
       pageSize.value = response.size;
@@ -269,6 +283,7 @@
           proIntroduction: record.proIntroduction || null,
           proDate: record.proDate || null,
           proType: record.proType || null,
+          travelAgency: res.records.find(item => item.id === record.travelId)?.organization || null,
           proPageImg: record.proPageImg || null,
           posters: record.posters || null,
           proMan: record.proMan || null,
@@ -281,6 +296,7 @@
           id: record.id || null,
           key: i,
         });
+        console.log('travelAgency',product.travelAgency);
         // 产品封装
         productList.value.push(product);
         // 批次套餐封装
@@ -404,16 +420,23 @@
       align: 'center',
     },
     {
+      title: '旅行社团',
+      dataIndex: 'travelAgency',
+      key: '14',
+      width: 155,
+      align: 'center',
+    },
+    {
       title: '推荐指数',
       dataIndex: 'recNum',
-      key: '14',
+      key: '15',
       width: 155,
       align: 'center',
     },
     {
       title: '操作',
       dataIndex: 'operation',
-      key: '15',
+      key: '16',
       fixed: 'right',
       width: 180,
     },
@@ -489,6 +512,7 @@
       console.log('出错了，请刷新！！！');
     }
   };
+  console.log("清空表单");
   // 判断数据是否为空
   const isObjectEmpty = (obj) => {
     // 遍历对象的属性
@@ -511,6 +535,7 @@
     // 关闭模态框
     visible.value = false;
     // 收集表单数据
+    console.log('formState: ',formState);
     let submitForm = { ...formState.value };
     console.log('111111111111111111111111111', submitForm);
     // debugger;
@@ -544,6 +569,7 @@
       }
       const response = await saveOrUpdate(submitForm);
     }
+    message.info('要更新数据请刷新界面');
   };
   // 关闭表单
   const clearForm = () => {
@@ -565,6 +591,11 @@
       visible.value = true;
       // 更新表单数据
       formState.value = { ...record };
+      Object.keys(formState.value).forEach((key) => {
+      if (!formState.value[key]) {
+        delete formState.value[key];
+        }
+      });
       // outerRecord = record;
       pageImg.value = [];
       posterImg.value = [];
@@ -583,6 +614,7 @@
     // 没有记录就是新增
     // 先清空或者重构
     formState.value = { ...currentData[0] };
+    console.log('清空或重构后');
     resetFormState();
     pageImg.value = [];
     posterImg.value = [];
